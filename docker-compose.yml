@@ -1,0 +1,87 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: bakementor
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  backend:
+    build:
+      context: ./backend
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      DJANGO_SETTINGS_MODULE: bakementor.settings
+      PYTHONUNBUFFERED: "1"
+    env_file:
+      - ./backend/bakementor/.env
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+
+  celery_worker:
+    build:
+      context: ./backend
+    command: celery -A bakementor worker -l info
+    env_file:
+      - ./backend/bakementor/.env
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - backend
+      - redis
+      - rabbitmq
+
+  celery_beat:
+    build:
+      context: ./backend
+    command: celery -A bakementor beat -l info
+    env_file:
+      - ./backend/bakementor/.env
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - backend
+      - redis
+      - rabbitmq
+
+  frontend:
+    build:
+      context: ./frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:8000
+    command: npm run dev -- -H 0.0.0.0 -p 3000
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
