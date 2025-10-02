@@ -17,10 +17,13 @@ import { ArrowLeft } from "lucide-react";
 import { BuilderToolbar } from "@/features/builder/components/builder-toolbar";
 import { ComponentPalette } from "@/features/builder/components/component-palette";
 import { BlockPalette } from "@/features/builder/components/block-palette";
+import { TemplatePalette } from "@/features/builder/components/template-palette";
+import { AiPalette } from "@/features/builder/components/ai-palette";
 import { BuilderCanvas } from "@/features/builder/components/builder-canvas";
 import { StyleInspector } from "@/features/builder/components/style-inspector";
 import { PropsInspector } from "@/features/builder/components/props-inspector";
 import { BLOCK_TEMPLATES } from "@/features/builder/blocks";
+import { PAGE_TEMPLATES } from "@/features/builder/templates.extra";
 import type { BuilderNode, ComponentManifestEntry, StyleDeclaration } from "@/types/builder";
 import { useBuilderStore } from "@/store/builder-store";
 import { createDocumentFromTree, findNode, findParentId, serializeDocumentTree } from "@/features/builder/utils";
@@ -74,7 +77,7 @@ export default function BuilderPage() {
 
   const [activeComponent, setActiveComponent] = useState<ComponentManifestEntry | null>(null);
   const [toast, setToast] = useState<{ id: number; message: string } | null>(null);
-  const [paletteTab, setPaletteTab] = useState<"elements" | "blocks">("elements");
+  const [paletteTab, setPaletteTab] = useState<"elements" | "blocks" | "templates" | "ai">("elements");
   const [publishFlowActive, setPublishFlowActive] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isConfigPanelVisible, setIsConfigPanelVisible] = useState(false);
@@ -91,6 +94,21 @@ export default function BuilderPage() {
     const { rootId, nodes } = template.create();
     insertBlock({ parentId: document.tree.root, rootId, nodes });
     showToast(template.name + " added");
+  };
+
+  const handleAiComplete = (definition: { tree: unknown; assets?: unknown; meta?: Record<string, unknown> }) => {
+    const newDocument = createDocumentFromTree(definition.tree, { ...(document?.meta ?? {}), ...(definition.meta ?? {}) }, definition.assets as BuilderDocument["assets"] | undefined);
+    loadDocument(newDocument);
+    showToast("AI template applied");
+  };
+
+  const handleSelectTemplate = (templateId: string) => {
+    const selected = PAGE_TEMPLATES.find((t) => t.id === templateId);
+    if (!selected) return;
+    const { tree, assets, meta } = selected.create();
+    const newDocument = createDocumentFromTree(tree, { ...(document?.meta ?? {}), ...(meta ?? {}), templateId }, assets);
+    loadDocument(newDocument);
+    showToast(selected.name + " applied");
   };
 
   useEffect(() => {
@@ -372,6 +390,18 @@ export default function BuilderPage() {
         return;
       }
 
+      if (isMod && key === "t") {
+        event.preventDefault();
+        setPaletteTab("templates");
+        return;
+      }
+
+      if (isMod && key === "i") {
+        event.preventDefault();
+        setPaletteTab("ai");
+        return;
+      }
+
       if (event.key === "Escape") {
         closeShortcuts();
       }
@@ -570,12 +600,35 @@ export default function BuilderPage() {
                   >
                     Blocks
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaletteTab("templates")}
+                    className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                      paletteTab === "templates" ? "bg-primary-600 text-white" : "text-surface-500 hover:text-primary-600"
+                    }`}
+                  >
+                    Templates
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaletteTab("ai")}
+                    className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                      paletteTab === "ai" ? "bg-primary-600 text-white" : "text-surface-500 hover:text-primary-600"
+                    }`}
+                  >
+                    AI
+                  </button>
                 </div>
                 <div className="flex-1 overflow-y-auto px-4 pb-6 pt-4">
-                  {paletteTab === "elements" ? (
-                    <ComponentPalette manifest={document.manifest} />
-                  ) : (
+                  {paletteTab === "elements" && <ComponentPalette manifest={document.manifest} />}
+                  {paletteTab === "blocks" && (
                     <BlockPalette blocks={BLOCK_TEMPLATES} onSelect={handleSelectBlock} />
+                  )}
+                  {paletteTab === "templates" && (
+                    <TemplatePalette templates={PAGE_TEMPLATES} onSelect={handleSelectTemplate} />
+                  )}
+                  {paletteTab === "ai" && (
+                    <AiPalette onComplete={handleAiComplete} />
                   )}
                 </div>
               </div>

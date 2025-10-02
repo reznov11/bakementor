@@ -40,7 +40,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "apps.common",
     "apps.accounts",
-    "apps.media",
+    "apps.library",
     "apps.pages",
     "apps.builder_templates",
     "apps.analytics",

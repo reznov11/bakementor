@@ -21,7 +21,7 @@ urlpatterns = [
     path("api/v1/auth/", include("apps.accounts.urls")),
     path("api/v1/pages/", include("apps.pages.urls")),
     path("api/v1/templates/", include("apps.builder_templates.urls")),
-    path("api/v1/media/", include("apps.media.urls")),
+    path("api/v1/media/", include("apps.library.urls")),
     path("api/v1/analytics/", include("apps.analytics.urls")),
 ]
 
