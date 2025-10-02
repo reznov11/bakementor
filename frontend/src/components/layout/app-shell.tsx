@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOut, Menu, Plus, Settings } from "lucide-react";
+import { LogOut, Menu, Moon, Plus, Settings, Sun } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import { useTheme } from "@/hooks/use-theme";
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
@@ -23,6 +24,8 @@ interface AppShellProps {
 export function AppShell({ title, action, children }: AppShellProps) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === "dark";
 
   return (
     <div className="flex min-h-screen flex-col bg-surface-50">
@@ -60,6 +63,14 @@ export function AppShell({ title, action, children }: AppShellProps) {
               <Link href="/menu">
                 <Menu className="h-5 w-5" />
               </Link>
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={toggleTheme}
+              title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
             <div className="flex flex-col text-right">
               <span className="text-sm font-semibold text-surface-800">{user?.first_name || user?.email}</span>

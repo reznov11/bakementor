@@ -1,10 +1,11 @@
 "use client";
 
-import { ArrowLeft, Eye, Save, Rocket, Monitor } from "lucide-react";
+import { ArrowLeft, Eye, Save, Rocket, Monitor, Sun, Moon } from "lucide-react";
 
 import { DEVICE_ICONS } from "@/features/builder/constants";
 import { Button } from "@/components/ui/button";
 import type { BreakpointId } from "@/types/builder";
+import { useTheme } from "@/hooks/use-theme";
 
 interface BuilderToolbarProps {
   activeBreakpoint: BreakpointId;
@@ -13,6 +14,7 @@ interface BuilderToolbarProps {
   onPreview: () => void;
   onSaveDraft: () => void;
   onPublish: () => void;
+  onOpenShortcuts: () => void;
   isSavingDraft?: boolean;
   isPublishing?: boolean;
 }
@@ -26,9 +28,13 @@ export function BuilderToolbar({
   onPreview,
   onSaveDraft,
   onPublish,
+  onOpenShortcuts,
   isSavingDraft = false,
   isPublishing = false,
 }: BuilderToolbarProps) {
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === "dark";
+
   return (
     <header className="flex items-center justify-between border-b border-surface-200 bg-white px-6 py-4">
       <div className="flex items-center gap-3">
@@ -42,6 +48,16 @@ export function BuilderToolbar({
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-3">
+        <div className="hidden items-center gap-2 rounded-full border border-surface-200 bg-surface-50 px-3 py-1 text-xs text-surface-500 sm:flex">
+          <button
+            type="button"
+            onClick={onOpenShortcuts}
+            className="flex items-center gap-1 text-surface-500 transition hover:text-primary-600"
+          >
+            Type <kbd className="rounded bg-surface-200 px-1">Ctrl</kbd>+
+            <kbd className="rounded bg-surface-200 px-1">/</kbd> to search
+          </button>
+        </div>
         <div className="flex items-center gap-1 rounded-full border border-surface-200 bg-surface-50 p-1">
           {BREAKPOINT_ORDER.map((breakpoint) => (
             <button
@@ -58,6 +74,14 @@ export function BuilderToolbar({
           ))}
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={toggleTheme}
+            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </Button>
           <Button variant="secondary" size="sm" className="gap-2" onClick={onPreview}>
             <Eye className="h-4 w-4" /> Preview
           </Button>

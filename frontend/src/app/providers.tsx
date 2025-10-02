@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode, useMemo, useState } from "react";
 
 import { AuthProvider } from "@/providers/auth-provider";
+import { ThemeProvider } from "@/providers/theme-provider";
 
 interface ProvidersProps {
   children: ReactNode;
@@ -15,8 +16,9 @@ export function Providers({ children }: ProvidersProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>{memoizedChildren}</AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>{memoizedChildren}</AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
-

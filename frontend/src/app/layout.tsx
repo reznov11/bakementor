@@ -22,6 +22,9 @@ export const metadata: Metadata = {
     default: "BakeMentor Builder",
   },
   description: "Internal page builder platform for creating and publishing marketing pages.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

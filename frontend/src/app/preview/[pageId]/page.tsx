@@ -90,7 +90,7 @@ export default function PreviewPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center gap-8 bg-surface-100 p-6">
+    <div className="theme-light-scope flex min-h-screen flex-col items-center gap-8 bg-surface-100 p-6">
       <header className="flex w-full max-w-5xl items-center justify-between">
         <div>
           <h1 className="text-lg font-semibold text-surface-900">Preview</h1>

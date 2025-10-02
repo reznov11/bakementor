@@ -9,13 +9,13 @@ interface BlockPaletteProps {
 
 export function BlockPalette({ blocks, onSelect }: BlockPaletteProps) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="theme-light-scope flex flex-col gap-3">
       {blocks.map((block) => (
         <button
           key={block.id}
           type="button"
           onClick={() => onSelect(block.id)}
-          className="flex items-start gap-3 rounded-lg border border-surface-200 bg-white p-3 text-left shadow-sm transition hover:border-primary-200 hover:shadow-subtle"
+          className="flex cursor-pointer items-start gap-3 rounded-lg border border-surface-200 bg-white p-3 text-left shadow-sm transition hover:border-primary-200 hover:bg-white/90 hover:shadow-subtle"
         >
           <div className="flex h-12 w-12 items-center justify-center rounded-md bg-surface-100 text-sm font-semibold text-primary-500">
             {block.name.slice(0, 2).toUpperCase()}

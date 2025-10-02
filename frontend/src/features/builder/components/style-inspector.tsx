@@ -44,7 +44,7 @@ const TYPOGRAPHY_CONTROLS: ControlConfig[] = [
   { property: "fontSize", label: "Font size", type: "slider", min: 12, max: 72, step: 2 },
   { property: "fontWeight", label: "Weight", type: "select", options: { normal: "Normal", 500: "Medium", 600: "Semibold", bold: "Bold" } },
   { property: "lineHeight", label: "Line height", type: "slider", min: 12, max: 96, step: 2 },
-  { property: "color", label: "Text color", type: "input" },
+  { property: "color", label: "Text color", type: "color" },
   { property: "textAlign", label: "Align", type: "select", options: { left: "Left", center: "Center", right: "Right" } },
 ];
 
@@ -126,9 +126,9 @@ export function StyleInspector({ node, activeBreakpoint, onChange }: StyleInspec
 
   if (!node) {
     return (
-      <aside className="flex h-full flex-col gap-4 border-l border-surface-200 bg-white p-4">
-        <p className="text-sm text-surface-500">Select a component to edit its styles.</p>
-      </aside>
+      <div className="rounded-lg border border-dashed border-surface-200 bg-surface-50 p-4 text-xs text-surface-500">
+        Select a component to edit its styles.
+      </div>
     );
   }
 
@@ -254,7 +254,7 @@ export function StyleInspector({ node, activeBreakpoint, onChange }: StyleInspec
   };
 
   return (
-    <aside className="flex h-full flex-col gap-6">
+    <div className="flex flex-col gap-6">
       {controlsByGroup.map((group) => (
         <section key={group.id} className="space-y-3">
           <h3 className="text-xs font-semibold uppercase tracking-wide text-surface-500">{group.label}</h3>
@@ -268,6 +268,6 @@ export function StyleInspector({ node, activeBreakpoint, onChange }: StyleInspec
           </div>
         </section>
       ))}
-    </aside>
+    </div>
   );
 }

@@ -30,8 +30,8 @@ function PaletteItem({ entry }: { entry: ComponentManifestEntry }) {
       type="button"
       {...listeners}
       {...attributes}
-      className={`flex flex-col gap-1 rounded-lg border border-surface-200 bg-surface-50 p-3 text-left shadow-sm transition hover:border-primary-200 hover:bg-white ${
-        isDragging ? "opacity-50" : ""
+      className={`flex flex-col gap-1 rounded-lg border border-surface-200 bg-white p-3 text-left shadow-sm transition hover:border-primary-200 hover:bg-white/90 ${
+        isDragging ? "opacity-50 cursor-grabbing" : "cursor-grab"
       }`}
     >
       <span className="text-sm font-medium text-surface-800">{entry.label}</span>
@@ -56,7 +56,7 @@ export function ComponentPalette({ manifest }: ComponentPaletteProps) {
   }, [manifest]);
 
   return (
-    <aside className="flex h-full min-w-[240px] flex-col gap-4 overflow-y-auto border-r border-surface-200 bg-white p-4">
+    <aside className="theme-light-scope flex h-full min-w-[240px] flex-col gap-4 overflow-y-auto border-r border-surface-200 bg-white p-4">
       <header className="flex flex-col gap-1">
         <h2 className="text-sm font-semibold text-surface-800">Components</h2>
         <p className="text-xs text-surface-500">Drag components into the canvas</p>
@@ -78,4 +78,3 @@ export function ComponentPalette({ manifest }: ComponentPaletteProps) {
     </aside>
   );
 }
-

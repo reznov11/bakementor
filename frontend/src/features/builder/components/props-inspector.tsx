@@ -20,6 +20,8 @@ interface FieldMetadata {
   label: string;
   multiline?: boolean;
   helperText?: string;
+  type?: "text" | "textarea" | "select";
+  options?: Array<{ value: string; label: string; }>;
 }
 
 const PROPERTY_METADATA: Record<string, FieldMetadata[]> = {
@@ -34,6 +36,35 @@ const PROPERTY_METADATA: Record<string, FieldMetadata[]> = {
   "content.image": [
     { key: "url", label: "Image URL" },
     { key: "alt", label: "Alt text" },
+    { key: "height", label: "Height", helperText: "Accepts any CSS length value (e.g. 320px, 50vh, auto)" },
+    {
+      key: "objectFit",
+      label: "Object fit",
+      type: "select",
+      options: [
+        { value: "cover", label: "Cover" },
+        { value: "contain", label: "Contain" },
+        { value: "fill", label: "Fill" },
+        { value: "none", label: "None" },
+        { value: "scale-down", label: "Scale down" },
+      ],
+    },
+    {
+      key: "objectPosition",
+      label: "Object position",
+      type: "select",
+      options: [
+        { value: "center", label: "Center" },
+        { value: "top", label: "Top" },
+        { value: "bottom", label: "Bottom" },
+        { value: "left", label: "Left" },
+        { value: "right", label: "Right" },
+        { value: "top left", label: "Top left" },
+        { value: "top right", label: "Top right" },
+        { value: "bottom left", label: "Bottom left" },
+        { value: "bottom right", label: "Bottom right" },
+      ],
+    },
   ],
   "content.logo": [
     { key: "text", label: "Logo Text" },
@@ -43,6 +74,20 @@ const PROPERTY_METADATA: Record<string, FieldMetadata[]> = {
   "content.navLink": [
     { key: "label", label: "Label" },
     { key: "href", label: "Link" },
+  ],
+  "content.link": [
+    { key: "label", label: "Label" },
+    { key: "href", label: "Link" },
+    {
+      key: "target",
+      label: "Open link in",
+      type: "select",
+      options: [
+        { value: "_self", label: "Same tab" },
+        { value: "_blank", label: "New tab" },
+        { value: "_parent", label: "Parent frame" },
+      ],
+    },
   ],
   "content.stat": [
     { key: "value", label: "Value" },
@@ -64,6 +109,38 @@ const PROPERTY_METADATA: Record<string, FieldMetadata[]> = {
     { key: "name", label: "Name" },
     { key: "options", label: "Options (one per line)", multiline: true },
   ],
+  "forms.checkbox": [
+    { key: "label", label: "Label" },
+    { key: "name", label: "Name" },
+    {
+      key: "defaultChecked",
+      label: "Checked by default",
+      type: "select",
+      options: [
+        { value: "true", label: "Yes" },
+        { value: "false", label: "No" },
+      ],
+    },
+  ],
+  "forms.radio": [
+    { key: "label", label: "Label" },
+    { key: "name", label: "Name" },
+    { key: "value", label: "Value" },
+    {
+      key: "defaultChecked",
+      label: "Selected by default",
+      type: "select",
+      options: [
+        { value: "true", label: "Yes" },
+        { value: "false", label: "No" },
+      ],
+    },
+  ],
+  "forms.datetime": [
+    { key: "label", label: "Label" },
+    { key: "name", label: "Name" },
+    { key: "defaultValue", label: "Default value", helperText: "Use ISO format e.g. 2025-01-01T09:00" },
+  ],
   "media.video": [
     { key: "source", label: "Video Source URL" },
     { key: "poster", label: "Poster Image URL" },
@@ -84,6 +161,16 @@ export function PropsInspector({ node, onChange, canDelete = false, onDelete }: 
     return null;
   }
 
+  const parseValue = (field: FieldMetadata, raw: string): unknown => {
+    if (field.type === "select" && field.options?.some((option) => option.value === "true" || option.value === "false")) {
+      if (raw === "") {
+        return undefined;
+      }
+      return raw === "true";
+    }
+    return raw;
+  };
+
   return (
     <section className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -96,13 +183,35 @@ export function PropsInspector({ node, onChange, canDelete = false, onDelete }: 
       </div>
       {fields.length > 0 ? (
         <div className="flex flex-col gap-3">
-          {fields.map(({ key, label, multiline }) => (
+          {fields.map(({ key, label, multiline, helperText, type, options }) => (
             <div key={key} className="flex flex-col gap-1">
               <Label className="text-xs text-surface-500">{label}</Label>
               {(() => {
                 const rawValue = node.props?.[key];
                 const value = rawValue === undefined || rawValue === null ? "" : String(rawValue);
-                if (multiline) {
+                const fieldType: FieldMetadata["type"] = type ?? (multiline ? "textarea" : "text");
+
+                if (fieldType === "select" && options) {
+                  return (
+                    <select
+                      className="h-9 w-full rounded-lg border border-surface-200 bg-white px-2 text-sm text-surface-700 focus:border-primary-400 focus:outline-none"
+                      value={value}
+                      onChange={(event) => {
+                        const nextValue = parseValue({ key, label, multiline, helperText, type, options }, event.target.value);
+                        onChange({ [key]: nextValue });
+                      }}
+                    >
+                      <option value="">Default</option>
+                      {options.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  );
+                }
+
+                if (fieldType === "textarea") {
                   return (
                     <Textarea
                       rows={4}
@@ -111,6 +220,7 @@ export function PropsInspector({ node, onChange, canDelete = false, onDelete }: 
                     />
                   );
                 }
+
                 return (
                   <Input
                     value={value}
@@ -118,6 +228,7 @@ export function PropsInspector({ node, onChange, canDelete = false, onDelete }: 
                   />
                 );
               })()}
+              {helperText ? <p className="text-[10px] text-surface-400">{helperText}</p> : null}
             </div>
           ))}
         </div>

@@ -12,6 +12,8 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 
+import { ArrowLeft } from "lucide-react";
+
 import { BuilderToolbar } from "@/features/builder/components/builder-toolbar";
 import { ComponentPalette } from "@/features/builder/components/component-palette";
 import { BlockPalette } from "@/features/builder/components/block-palette";
@@ -24,8 +26,18 @@ import { useBuilderStore } from "@/store/builder-store";
 import { createDocumentFromTree, findNode, findParentId, serializeDocumentTree } from "@/features/builder/utils";
 import { useCreatePageVersion, usePage, usePublishPage } from "@/features/pages/hooks";
 import type { PageVersionPayload } from "@/types/pages";
+import { Button } from "@/components/ui/button";
 
 const PREVIEW_STORAGE_KEY_PREFIX = "bakementor:preview:";
+
+const KEYBOARD_SHORTCUTS: Array<{ combo: string; description: string }> = [
+  { combo: "Ctrl + /", description: "Open shortcuts" },
+  { combo: "Ctrl + S", description: "Save draft" },
+  { combo: "Ctrl + P", description: "Publish page" },
+  { combo: "Ctrl + R", description: "Preview current page" },
+  { combo: "Ctrl + B", description: "Open block library" },
+  { combo: "Ctrl + E", description: "Open element library" },
+];
 
 export default function BuilderPage() {
   const params = useParams<{ pageId: string }>();
@@ -64,6 +76,12 @@ export default function BuilderPage() {
   const [toast, setToast] = useState<{ id: number; message: string } | null>(null);
   const [paletteTab, setPaletteTab] = useState<"elements" | "blocks">("elements");
   const [publishFlowActive, setPublishFlowActive] = useState(false);
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const [isConfigPanelVisible, setIsConfigPanelVisible] = useState(false);
+  const [lastDismissedNodeId, setLastDismissedNodeId] = useState<string | null>(null);
+
+  const openShortcuts = useCallback(() => setIsShortcutsOpen(true), []);
+  const closeShortcuts = useCallback(() => setIsShortcutsOpen(false), []);
 
   const handleSelectBlock = (blockId: string) => {
     if (!document) return;
@@ -88,14 +106,71 @@ export default function BuilderPage() {
   }, [page, document, loadDocument]);
 
   const selectedNode = useMemo(() => findNode(document, selectedNodeId), [document, selectedNodeId]);
+  const selectedNodeDefinition = useMemo(() => {
+    if (!document || !selectedNode) return null;
+    return document.manifest.find((entry) => entry.key === selectedNode.component) ?? null;
+  }, [document, selectedNode]);
+  const rootNodeId = document?.tree.root ?? null;
 
-  const showToast = (message: string) => {
+  useEffect(() => {
+    if (!rootNodeId) {
+      setIsConfigPanelVisible(false);
+      setLastDismissedNodeId(null);
+      return;
+    }
+
+    if (!selectedNodeId) {
+      setIsConfigPanelVisible(false);
+      setLastDismissedNodeId(null);
+      return;
+    }
+
+    if (selectedNodeId === rootNodeId) {
+      setIsConfigPanelVisible(false);
+      return;
+    }
+
+    if (!isConfigPanelVisible && lastDismissedNodeId === selectedNodeId) {
+      return;
+    }
+
+    setIsConfigPanelVisible(true);
+    if (lastDismissedNodeId) {
+      setLastDismissedNodeId(null);
+    }
+  }, [rootNodeId, selectedNodeId, isConfigPanelVisible, lastDismissedNodeId]);
+
+  const handleHideConfigPanel = () => {
+    setIsConfigPanelVisible(false);
+    if (selectedNodeId) {
+      setLastDismissedNodeId(selectedNodeId);
+    }
+  };
+
+  const handleSelectNode = (nodeId: string) => {
+    selectNode(nodeId);
+
+    if (!rootNodeId) {
+      return;
+    }
+
+    if (!nodeId || nodeId === rootNodeId) {
+      setIsConfigPanelVisible(false);
+      setLastDismissedNodeId(null);
+      return;
+    }
+
+    setLastDismissedNodeId(null);
+    setIsConfigPanelVisible(true);
+  };
+
+  const showToast = useCallback((message: string) => {
     const id = Date.now();
     setToast({ id, message });
     window.setTimeout(() => {
       setToast((current) => (current?.id === id ? null : current));
     }, 3000);
-  };
+  }, []);
 
   const formatErrorMessage = (error: unknown, fallback: string) => {
     if (error && typeof error === "object" && "message" in error && typeof (error as { message: unknown }).message === "string") {
@@ -105,7 +180,7 @@ export default function BuilderPage() {
     return fallback;
   };
 
-  const buildVersionPayload = (): PageVersionPayload | null => {
+  const buildVersionPayload = useCallback((): PageVersionPayload | null => {
     if (!document || !page) return null;
     const currentVersion = page.current_version;
     const payload: PageVersionPayload = {
@@ -123,7 +198,7 @@ export default function BuilderPage() {
     }
 
     return payload;
-  };
+  }, [document, page]);
 
   const handleBack = () => {
     router.push("/dashboard");
@@ -156,7 +231,7 @@ export default function BuilderPage() {
     persistPreviewSnapshot();
   }, [persistPreviewSnapshot]);
 
-  const handlePreview = () => {
+  const handlePreview = useCallback(() => {
     if (!document) {
       showToast("Nothing to preview yet");
       return;
@@ -168,9 +243,9 @@ export default function BuilderPage() {
       const url = `/preview/${pageId}?breakpoint=${activeBreakpoint}`;
       window.open(url, "_blank", "noopener");
     }
-  };
+  }, [activeBreakpoint, document, pageId, persistPreviewSnapshot, showToast]);
 
-  const handleSaveDraft = async () => {
+  const handleSaveDraft = useCallback(async () => {
     if (!document) {
       showToast("Nothing to save yet");
       return;
@@ -197,9 +272,9 @@ export default function BuilderPage() {
       console.error("Failed to save draft", error);
       showToast(formatErrorMessage(error, "Failed to save draft"));
     }
-  };
+  }, [buildVersionPayload, createPageVersion, document, markSaved, page, publishFlowActive, publishPageMutation, showToast]);
 
-  const handlePublish = async () => {
+  const handlePublish = useCallback(async () => {
     if (!document) {
       showToast("Nothing to publish yet");
       return;
@@ -237,7 +312,7 @@ export default function BuilderPage() {
     } finally {
       setPublishFlowActive(false);
     }
-  };
+  }, [buildVersionPayload, createPageVersion, document, markSaved, page, publishFlowActive, publishPageMutation, showToast]);
 
   const handleStyleChange = (style: Partial<StyleDeclaration>) => {
     if (!selectedNodeId) return;
@@ -255,6 +330,56 @@ export default function BuilderPage() {
     deleteNode(selectedNode.id);
     showToast("Component removed");
   };
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const isMod = event.ctrlKey || event.metaKey;
+      const key = event.key.toLowerCase();
+
+      if (isMod && event.key === "/") {
+        event.preventDefault();
+        openShortcuts();
+        return;
+      }
+
+      if (isMod && key === "s") {
+        event.preventDefault();
+        void handleSaveDraft();
+        return;
+      }
+
+      if (isMod && key === "p") {
+        event.preventDefault();
+        void handlePublish();
+        return;
+      }
+
+      if (isMod && key === "r") {
+        event.preventDefault();
+        handlePreview();
+        return;
+      }
+
+      if (isMod && key === "b") {
+        event.preventDefault();
+        setPaletteTab("blocks");
+        return;
+      }
+
+      if (isMod && key === "e") {
+        event.preventDefault();
+        setPaletteTab("elements");
+        return;
+      }
+
+      if (event.key === "Escape") {
+        closeShortcuts();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [closeShortcuts, handlePreview, handlePublish, handleSaveDraft, openShortcuts, setPaletteTab]);
 
   const handleDragStart = (event: DragStartEvent) => {
     const payload = event.active.data.current;
@@ -376,61 +501,94 @@ export default function BuilderPage() {
         onPreview={handlePreview}
         onSaveDraft={handleSaveDraft}
         onPublish={handlePublish}
+        onOpenShortcuts={openShortcuts}
         isSavingDraft={isSavingDraft}
         isPublishing={isPublishing}
       />
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-        <div className="grid flex-1 grid-cols-[280px_1fr_320px] overflow-hidden bg-surface-100">
+        <div className="grid flex-1 grid-cols-[300px_1fr] overflow-hidden bg-surface-100">
           <aside className="hidden h-full min-h-0 flex-col border-r border-surface-200 bg-white xl:flex">
-            <div className="flex items-center gap-2 border-b border-surface-200 px-4 py-3">
-              <button
-                type="button"
-                onClick={() => setPaletteTab("elements")}
-                className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                  paletteTab === "elements" ? "bg-primary-600 text-white" : "text-surface-500 hover:text-primary-600"
-                }`}
-              >
-                Elements
-              </button>
-              <button
-                type="button"
-                onClick={() => setPaletteTab("blocks")}
-                className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                  paletteTab === "blocks" ? "bg-primary-600 text-white" : "text-surface-500 hover:text-primary-600"
-                }`}
-              >
-                Blocks
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto px-4 pb-6 pt-4">
-              {paletteTab === "elements" ? (
-                <ComponentPalette manifest={document.manifest} />
-              ) : (
-                <BlockPalette blocks={BLOCK_TEMPLATES} onSelect={handleSelectBlock} />
-              )}
-            </div>
+            {isConfigPanelVisible ? (
+              <div className="flex h-full flex-col">
+                <div className="flex items-center justify-between gap-2 border-b border-surface-200 px-4 py-3">
+                  <button
+                    type="button"
+                    onClick={handleHideConfigPanel}
+                    className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium text-surface-500 transition hover:text-primary-600"
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5" />
+                    Library
+                  </button>
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-surface-400">Content config</span>
+                </div>
+                <div className="border-b border-surface-200 px-4 py-3">
+                  <p className="text-[10px] uppercase tracking-wide text-surface-400">Selected</p>
+                  <p className="text-sm font-semibold text-surface-800">
+                    {selectedNodeDefinition?.label ?? selectedNode?.component ?? "Nothing selected"}
+                  </p>
+                </div>
+                <div className="flex-1 overflow-y-auto px-4 py-4">
+                  {selectedNode ? (
+                    <div className="flex flex-col gap-6 pb-6">
+                      <PropsInspector
+                        node={selectedNode}
+                        onChange={handlePropChange}
+                        canDelete={canDeleteSelected}
+                        onDelete={handleDeleteSelected}
+                      />
+                      <StyleInspector
+                        node={selectedNode}
+                        activeBreakpoint={activeBreakpoint}
+                        onChange={handleStyleChange}
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex h-full items-center justify-center px-2 text-center text-xs text-surface-500">
+                      Select a component to configure its content and styling.
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="flex h-full flex-col">
+                <div className="flex items-center gap-2 border-b border-surface-200 px-4 py-3">
+                  <button
+                    type="button"
+                    onClick={() => setPaletteTab("elements")}
+                    className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                      paletteTab === "elements" ? "bg-primary-600 text-white" : "text-surface-500 hover:text-primary-600"
+                    }`}
+                  >
+                    Elements
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaletteTab("blocks")}
+                    className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                      paletteTab === "blocks" ? "bg-primary-600 text-white" : "text-surface-500 hover:text-primary-600"
+                    }`}
+                  >
+                    Blocks
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto px-4 pb-6 pt-4">
+                  {paletteTab === "elements" ? (
+                    <ComponentPalette manifest={document.manifest} />
+                  ) : (
+                    <BlockPalette blocks={BLOCK_TEMPLATES} onSelect={handleSelectBlock} />
+                  )}
+                </div>
+              </div>
+            )}
           </aside>
           <div className="flex flex-1 flex-col overflow-hidden">
             <BuilderCanvas
               document={document}
               breakpoint={activeBreakpoint}
               selectedNodeId={selectedNodeId}
-              onSelectNode={selectNode}
+              onSelectNode={handleSelectNode}
             />
           </div>
-          <aside className="hidden h-full flex-col gap-6 overflow-y-auto border-l border-surface-200 bg-white p-5 lg:flex">
-            <PropsInspector
-              node={selectedNode}
-              onChange={handlePropChange}
-              canDelete={canDeleteSelected}
-              onDelete={handleDeleteSelected}
-            />
-            <StyleInspector
-              node={selectedNode}
-              activeBreakpoint={activeBreakpoint}
-              onChange={handleStyleChange}
-            />
-          </aside>
         </div>
         <DragOverlay>
           {activeComponent ? (
@@ -440,6 +598,45 @@ export default function BuilderPage() {
           ) : null}
         </DragOverlay>
       </DndContext>
+      {isShortcutsOpen && (
+        <div
+          className="theme-light-scope fixed inset-0 z-50 flex items-center justify-center bg-surface-900/40 p-4 backdrop-blur-sm"
+          onClick={closeShortcuts}
+        >
+          <div
+            className="w-full max-w-lg rounded-2xl border border-surface-200 bg-white p-6 shadow-subtle"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-surface-900">Keyboard shortcuts</h2>
+                <p className="text-sm text-surface-500">Boost your workflow with these quick commands.</p>
+              </div>
+              <Button variant="ghost" size="sm" onClick={closeShortcuts}>
+                Close
+              </Button>
+            </div>
+            <div className="mt-5 flex flex-col gap-3">
+              {KEYBOARD_SHORTCUTS.map((shortcut) => (
+                <div
+                  key={shortcut.combo}
+                  className="flex items-center justify-between rounded-lg border border-surface-200 bg-surface-50 px-3 py-2 text-sm"
+                >
+                  <span className="font-medium text-surface-700">{shortcut.description}</span>
+                  <span className="flex items-center gap-1 text-xs font-semibold text-surface-500">
+                    {shortcut.combo.split("+").map((part, index, array) => (
+                      <span key={`${shortcut.combo}-${part}-${index}`} className="flex items-center gap-1">
+                        <kbd className="rounded bg-surface-200 px-2 py-0.5 text-[11px] uppercase text-surface-600">{part.trim()}</kbd>
+                        {index < array.length - 1 ? <span className="text-surface-400">+</span> : null}
+                      </span>
+                    ))}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
       {toast && (
         <div className="pointer-events-auto fixed bottom-6 right-6 min-w-[220px] rounded-lg bg-surface-900 px-4 py-3 text-sm font-medium text-white shadow-subtle">
           {toast.message}

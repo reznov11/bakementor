@@ -33,6 +33,8 @@ export function NodeRenderer({ node, breakpoint, readOnly = false, children }: N
   const sliderAutoplay = Number(node.props?.autoplay ?? 0);
   const [isEditingButton, setIsEditingButton] = useState(false);
   const buttonEditableRef = useRef<HTMLSpanElement | null>(null);
+  const [isEditingLink, setIsEditingLink] = useState(false);
+  const linkEditableRef = useRef<HTMLSpanElement | null>(null);
 
   useEffect(() => {
     if (node.component !== "media.slider") return;
@@ -79,6 +81,26 @@ export function NodeRenderer({ node, breakpoint, readOnly = false, children }: N
       setIsEditingButton(false);
     }
   }, [node.component, isEditingButton]);
+
+  useEffect(() => {
+    if (node.component !== "content.link") return;
+    if (!isEditingLink) return;
+    const span = linkEditableRef.current;
+    if (span) {
+      span.focus();
+      const range = document.createRange();
+      range.selectNodeContents(span);
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+    }
+  }, [node.component, isEditingLink]);
+
+  useEffect(() => {
+    if (node.component !== "content.link" && isEditingLink) {
+      setIsEditingLink(false);
+    }
+  }, [node.component, isEditingLink]);
 
   const component = node.component;
 
@@ -237,9 +259,77 @@ export function NodeRenderer({ node, breakpoint, readOnly = false, children }: N
     );
   }
 
+  if (component === "content.link") {
+    const label = (node.props?.label as string) ?? "Link";
+    const href = (node.props?.href as string) ?? "#";
+    const target = (node.props?.target as string | undefined) ?? "_self";
+    const rel = target === "_blank" ? "noopener noreferrer" : undefined;
+
+    return (
+      <a
+        href={href}
+        target={target}
+        rel={rel}
+        style={style}
+        className="inline-flex items-center text-primary-600 underline-offset-4 transition hover:underline"
+        onClick={(event) => {
+          if (!readOnly && !isEditingLink) {
+            event.preventDefault();
+          }
+        }}
+        onDoubleClick={(event) => {
+          if (readOnly) return;
+          event.preventDefault();
+          setIsEditingLink(true);
+        }}
+      >
+        <span
+          ref={linkEditableRef}
+          contentEditable={!readOnly && isEditingLink}
+          suppressContentEditableWarning
+          onBlur={(event) => {
+            if (!readOnly) {
+              updateNodeProps(node.id, { label: event.currentTarget.textContent ?? "" });
+              setIsEditingLink(false);
+            }
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              (event.target as HTMLElement).blur();
+            }
+          }}
+          className={!readOnly ? "outline-none" : undefined}
+        >
+          {label}
+        </span>
+      </a>
+    );
+  }
+
   if (component === "content.image") {
     const src = (node.props?.url as string) || DEFAULT_IMAGE_PLACEHOLDER;
     const alt = (node.props?.alt as string) ?? "";
+    const height = (node.props?.height as string | undefined) ?? undefined;
+    const objectFitProp = (node.props?.objectFit as string | undefined) ?? undefined;
+    const objectPositionProp = (node.props?.objectPosition as string | undefined) ?? undefined;
+
+    const containerStyle: CSSProperties = { ...style };
+    if (height) {
+      containerStyle.height = height;
+    }
+
+    const imageStyle: CSSProperties = {
+      width: "100%",
+      display: "block",
+      objectFit: (objectFitProp ?? "cover") as CSSProperties["objectFit"],
+      objectPosition: objectPositionProp ?? "center",
+    };
+    if (height) {
+      imageStyle.height = height;
+    } else {
+      imageStyle.height = "auto";
+    }
 
     const handleUpload = (event: ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
@@ -259,9 +349,9 @@ export function NodeRenderer({ node, breakpoint, readOnly = false, children }: N
     };
 
     return (
-      <div style={style} className="relative w-full overflow-hidden rounded-xl bg-surface-100">
+      <div style={containerStyle} className="relative w-full overflow-hidden rounded-xl bg-surface-100">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} alt={alt} className="h-full w-full object-cover" />
+        <img src={src} alt={alt} style={imageStyle} />
         {!readOnly && (
           <div className="absolute inset-x-3 bottom-3 flex gap-2 rounded-full bg-surface-900/60 p-1 text-xs text-white backdrop-blur">
             <button type="button" className="flex-1 rounded-full bg-white/20 px-3 py-1 transition hover:bg-white/40" onClick={openFilePicker}>
@@ -325,6 +415,62 @@ export function NodeRenderer({ node, breakpoint, readOnly = false, children }: N
             <option key={option}>{option}</option>
           ))}
         </select>
+      </label>
+    );
+  }
+
+  if (component === "forms.checkbox") {
+    const label = (node.props?.label as string) ?? "Checkbox";
+    const name = (node.props?.name as string) ?? "checkbox";
+    const defaultChecked = node.props?.defaultChecked === true || node.props?.defaultChecked === "true";
+
+    return (
+      <label style={style} className="flex items-center gap-2 text-sm text-surface-700">
+        <input
+          type="checkbox"
+          name={name}
+          defaultChecked={defaultChecked}
+          className="h-4 w-4 rounded border border-surface-300 text-primary-600 focus:ring-primary-400"
+        />
+        <span>{label}</span>
+      </label>
+    );
+  }
+
+  if (component === "forms.radio") {
+    const label = (node.props?.label as string) ?? "Radio";
+    const name = (node.props?.name as string) ?? "radio-group";
+    const value = (node.props?.value as string) ?? label;
+    const defaultChecked = node.props?.defaultChecked === true || node.props?.defaultChecked === "true";
+
+    return (
+      <label style={style} className="flex items-center gap-2 text-sm text-surface-700">
+        <input
+          type="radio"
+          name={name}
+          value={value}
+          defaultChecked={defaultChecked}
+          className="h-4 w-4 border border-surface-300 text-primary-600 focus:ring-primary-400"
+        />
+        <span>{label}</span>
+      </label>
+    );
+  }
+
+  if (component === "forms.datetime") {
+    const label = (node.props?.label as string) ?? "Date & time";
+    const name = (node.props?.name as string) ?? "datetime";
+    const defaultValue = (node.props?.defaultValue as string) ?? "";
+
+    return (
+      <label style={style} className="flex w-full flex-col gap-1">
+        <span className="text-xs font-medium text-surface-600">{label}</span>
+        <input
+          type="datetime-local"
+          name={name}
+          defaultValue={defaultValue}
+          className="h-11 w-full rounded-lg border border-surface-200 px-3 text-sm shadow-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+        />
       </label>
     );
   }

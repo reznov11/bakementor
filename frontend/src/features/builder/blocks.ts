@@ -1086,7 +1086,30 @@ const createPricingBlock = (): BlockDefinition => {
   const sectionId = nanoid();
   const headingId = nanoid();
   const rowId = nanoid();
-  const tiers = Array.from({ length: 3 }, () => nanoid());
+
+  const tierConfigs = [
+    {
+      name: "Starter",
+      price: "$29/mo",
+      description: "Launch up to 5 pages with basic analytics and email support.",
+      cta: "Choose Starter",
+      highlight: false,
+    },
+    {
+      name: "Growth",
+      price: "$59/mo",
+      description: "Unlimited funnels, advanced targeting, and priority reviews.",
+      cta: "Choose Growth",
+      highlight: true,
+    },
+    {
+      name: "Scale",
+      price: "Custom",
+      description: "Workflows, audit logs, and concierge support for large teams.",
+      cta: "Talk to sales",
+      highlight: false,
+    },
+  ] as const;
 
   const nodes: Record<string, BuilderNode> = {
     [sectionId]: {
@@ -1120,32 +1143,118 @@ const createPricingBlock = (): BlockDefinition => {
         },
       },
     },
-        [rowId]: {
+    [rowId]: {
       id: rowId,
       type: "layout",
       component: "layout.row",
       props: {},
-      children: statIds,
+      children: [],
       styles: {
         base: {
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
           gap: "24px",
         },
       },
     },
   };
 
-  stats.forEach((stat, index) => {
-    nodes[statIds[index]] = {
-      id: statIds[index],
+  tierConfigs.forEach((tier) => {
+    const columnId = nanoid();
+    const titleId = nanoid();
+    const priceId = nanoid();
+    const descriptionId = nanoid();
+    const buttonId = nanoid();
+
+    nodes[rowId].children.push(columnId);
+
+    nodes[columnId] = {
+      id: columnId,
+      type: "layout",
+      component: "layout.column",
+      props: {},
+      children: [titleId, priceId, descriptionId, buttonId],
+      styles: {
+        base: {
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
+          padding: { top: "32px", bottom: "32px", left: "24px", right: "24px" },
+          borderRadius: "28px",
+          backgroundColor: tier.highlight ? "#0f172a" : "#f8fafc",
+          color: tier.highlight ? "#f8fafc" : "#0f172a",
+          boxShadow: tier.highlight ? "0 20px 40px rgba(15, 23, 42, 0.18)" : undefined,
+          border: tier.highlight ? "2px solid #0ea5e9" : "1px solid #e2e8f0",
+        },
+      },
+    };
+
+    nodes[titleId] = {
+      id: titleId,
       type: "component",
-      component: "content.stat",
-      props: stat,
+      component: "content.richText",
+      props: {
+        text: tier.name,
+        tag: "h3",
+      },
       children: [],
       styles: {
         base: {
-          backgroundColor: "#1f2937",
+          fontSize: "22px",
+          fontWeight: 600,
+        },
+      },
+    };
+
+    nodes[priceId] = {
+      id: priceId,
+      type: "component",
+      component: "content.richText",
+      props: {
+        text: tier.price,
+        tag: "p",
+      },
+      children: [],
+      styles: {
+        base: {
+          fontSize: "32px",
+          fontWeight: 700,
+        },
+      },
+    };
+
+    nodes[descriptionId] = {
+      id: descriptionId,
+      type: "component",
+      component: "content.richText",
+      props: {
+        text: tier.description,
+        tag: "p",
+      },
+      children: [],
+      styles: {
+        base: {
+          fontSize: "15px",
+          lineHeight: "1.6",
+          color: tier.highlight ? "#e2e8f0" : "#475569",
+        },
+      },
+    };
+
+    nodes[buttonId] = {
+      id: buttonId,
+      type: "component",
+      component: "content.button",
+      props: {
+        label: tier.cta,
+        href: "#",
+      },
+      children: [],
+      styles: {
+        base: {
+          width: "100%",
+          backgroundColor: tier.highlight ? "#38bdf8" : "#e2e8f0",
+          color: tier.highlight ? "#0f172a" : "#0f172a",
         },
       },
     };
