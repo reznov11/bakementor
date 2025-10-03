@@ -1,0 +1,40 @@
+{
+  "builder": {
+    "dashboard": "Панель",
+    "builderName": "Конструктор BakeMentor",
+    "typeSearch": "Нажмите",
+    "ctrl": "Ctrl",
+    "slash": "/",
+    "toSearch": "чтобы искать",
+    "preview": "Предпросмотр",
+    "saving": "Сохранение...",
+    "saveDraft": "Сохранить черновик",
+    "publishing": "Публикация...",
+    "publish": "Опубликовать"
+  },
+  "inspector": {
+    "content": "Содержимое",
+    "delete": "Удалить",
+    "mediaLibrary": "Библиотека медиа",
+    "noEditable": "Нет редактируемых свойств для этого компонента.",
+    "defaultOption": "По умолчанию",
+    "yes": "Да",
+    "no": "Нет",
+    "imageURL": "URL изображения",
+    "altText": "Alt текст",
+    "height": "Высота",
+    "objectFit": "Режим заполнения",
+    "objectPosition": "Позиция изображения"
+  },
+  "canvas": {
+    "dropHere": "Перетащите компоненты сюда",
+    "addImagesInsideSlider": "Добавьте изображения внутрь слайдера"
+  },
+  "page": {
+    "failedToLoad": "Не удалось загрузить страницу. Пожалуйста, вернитесь на панель и попробуйте снова.",
+    "nothingToPreview": "Пока нечего предварительно просматривать",
+    "componentRemoved": "Компонент удалён",
+    "draftSaved": "Черновик сохранён",
+    "pagePublished": "Страница опубликована"
+  }
+}

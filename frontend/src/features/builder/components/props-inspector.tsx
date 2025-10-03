@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import t from "@/i18n";
 
 import type { BuilderNode } from "@/types/builder";
 import { Input } from "@/components/ui/input";
@@ -174,13 +175,13 @@ export function PropsInspector({ node, onChange, canDelete = false, onDelete }: 
   return (
     <section className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-surface-500">Content</h3>
-        {canDelete && onDelete && node.id && (
-          <Button variant="destructive" size="sm" onClick={onDelete}>
-            Delete
-          </Button>
-        )}
-      </div>
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-surface-500">{t("inspector.content")}</h3>
+            {canDelete && onDelete && node.id && (
+              <Button variant="destructive" size="sm" onClick={onDelete}>
+                {t("inspector.delete")}
+              </Button>
+            )}
+          </div>
       {fields.length > 0 ? (
         <div className="flex flex-col gap-3">
           {fields.map(({ key, label, multiline, helperText, type, options }) => (
@@ -282,7 +283,7 @@ export function PropsInspector({ node, onChange, canDelete = false, onDelete }: 
           ))}
         </div>
       ) : (
-        <p className="text-xs text-surface-500">No editable properties for this component.</p>
+        <p className="text-xs text-surface-500">{t("inspector.noEditable")}</p>
       )}
     </section>
   );

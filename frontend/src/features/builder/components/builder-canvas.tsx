@@ -4,6 +4,7 @@ import type { ReactNode, CSSProperties } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, useSortable, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { t } from "@/i18n";
 import { Copy, Trash2, Settings, Image as ImageIcon, Film, ChevronUp, ChevronDown } from "lucide-react";
 
 import type { BuilderDocument, BuilderNode, BreakpointId } from "@/types/builder";
@@ -289,11 +290,12 @@ function CanvasTree({ node, document, parentId, breakpoint, selectedNodeId, hove
   ));
 
   const content = isLayout ? (
-    <SortableContext items={children.map((child) => child.id)} strategy={rectSortingStrategy}>
+    <SortableContext 
+    items={children.map((child) => child.id)} strategy={rectSortingStrategy}>
       {renderedChildren}
       {children.length === 0 && (
         <div className="flex min-h-[160px] w-full items-center justify-center rounded-xl border border-dashed border-surface-300 bg-surface-100 text-xs font-medium uppercase tracking-wide text-surface-400">
-          Drop components here
+          {t("canvas.dropHere")}
         </div>
       )}
     </SortableContext>
@@ -401,7 +403,7 @@ export function BuilderCanvas({ document, breakpoint, selectedNodeId, onSelectNo
     >
       <div
         style={canvasStyle}
-        className="theme-light-scope relative flex min-h-full w-full flex-col p-10"
+        className="theme-light-scope relative flex min-h-full w-full flex-col pt-10"
       >
         <CanvasTree
           node={rootNode}

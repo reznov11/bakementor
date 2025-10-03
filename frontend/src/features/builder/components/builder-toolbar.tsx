@@ -6,6 +6,7 @@ import { DEVICE_ICONS } from "@/features/builder/constants";
 import { Button } from "@/components/ui/button";
 import type { BreakpointId } from "@/types/builder";
 import { useTheme } from "@/hooks/use-theme";
+import t from "@/i18n";
 
 interface BuilderToolbarProps {
   activeBreakpoint: BreakpointId;
@@ -40,22 +41,22 @@ export function BuilderToolbar({
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="sm" className="gap-2" onClick={onBack}>
           <ArrowLeft className="h-4 w-4" />
-          Dashboard
+          {t("builder.dashboard")}
         </Button>
         <div className="hidden items-center gap-2 text-sm font-medium text-surface-600 sm:flex">
           <Monitor className="h-4 w-4 text-primary-500" />
-          BakeMentor Builder
+          {t("builder.builderName")}
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <div className="hidden items-center gap-2 rounded-full border border-surface-200 bg-surface-50 px-3 py-1 text-xs text-surface-500 sm:flex">
-          <button
+            <button
             type="button"
             onClick={onOpenShortcuts}
             className="flex items-center gap-1 text-surface-500 transition hover:text-primary-600"
           >
-            Type <kbd className="rounded bg-surface-200 px-1">Ctrl</kbd>+
-            <kbd className="rounded bg-surface-200 px-1">/</kbd> to search
+            {t("builder.typeSearch")} <kbd className="rounded bg-surface-200 px-1">{t("builder.ctrl")}</kbd>+
+            <kbd className="rounded bg-surface-200 px-1">{t("builder.slash")}</kbd> {t("builder.toSearch")}
           </button>
         </div>
         <div className="flex items-center gap-1 rounded-full border border-surface-200 bg-surface-50 p-1">
@@ -83,10 +84,10 @@ export function BuilderToolbar({
             {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
           <Button variant="secondary" size="sm" className="gap-2" onClick={onPreview}>
-            <Eye className="h-4 w-4" /> Preview
+            <Eye className="h-4 w-4" /> {t("builder.preview")}
           </Button>
           <Button variant="secondary" size="sm" className="gap-2" onClick={onSaveDraft} disabled={isSavingDraft || isPublishing}>
-            <Save className="h-4 w-4" /> {isSavingDraft ? "Saving..." : "Save draft"}
+            <Save className="h-4 w-4" /> {isSavingDraft ? t("builder.saving") : t("builder.saveDraft")}
           </Button>
           <Button
             size="sm"
@@ -94,7 +95,7 @@ export function BuilderToolbar({
             onClick={onPublish}
             disabled={isPublishing}
           >
-            <Rocket className="h-4 w-4" /> {isPublishing ? "Publishing..." : "Publish"}
+            <Rocket className="h-4 w-4" /> {isPublishing ? t("builder.publishing") : t("builder.publish")}
           </Button>
         </div>
       </div>

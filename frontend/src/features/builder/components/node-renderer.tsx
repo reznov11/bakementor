@@ -4,6 +4,7 @@ import type { ChangeEvent, CSSProperties, ReactNode, FocusEvent, ElementType } f
 import { Children, useEffect, useMemo, useRef, useState } from "react";
 
 import { useBuilderStore } from "@/store/builder-store";
+import { t } from "@/i18n";
 import type { BuilderNode, BreakpointId } from "@/types/builder";
 import { computeNodeStyle, isLayoutNode } from "@/features/builder/style";
 
@@ -128,7 +129,7 @@ export function NodeRenderer({ node, breakpoint, readOnly = false, children }: N
   if (component === "media.slider") {
     const slides = sliderSlides.length > 0 ? sliderSlides : [
       <div key="empty" className="flex h-full w-full items-center justify-center rounded-3xl bg-surface-200 text-xs text-surface-500">
-        Add images inside the slider
+        {t("canvas.addImagesInsideSlider")}
       </div>,
     ];
 
