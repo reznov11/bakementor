@@ -221,6 +221,55 @@ export function PropsInspector({ node, onChange, canDelete = false, onDelete }: 
                   );
                 }
 
+                // If this is the image URL field for the content.image component, show a Media library button next to the input
+                if (key === "url" && node.component === "content.image") {
+                  return (
+                    <div className="flex items-center gap-2">
+                      <Input
+                        className="flex-1"
+                        value={value}
+                        onChange={(event) => onChange({ [key]: event.target.value })}
+                      />
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          if (typeof window === "undefined") return;
+                          const detail = { nodeId: node.id, type: "image" };
+                          window.dispatchEvent(new CustomEvent("bakementor:openMediaLibrary", { detail }));
+                        }}
+                      >
+                        Media library
+                      </Button>
+                    </div>
+                  );
+                }
+
+                // For video fields (source/poster) show Media library button to pick video or poster image
+                if ((key === "source" || key === "poster") && node.component === "media.video") {
+                  const pickType = key === "source" ? "video" : "image";
+                  return (
+                    <div className="flex items-center gap-2">
+                      <Input
+                        className="flex-1"
+                        value={value}
+                        onChange={(event) => onChange({ [key]: event.target.value })}
+                      />
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          if (typeof window === "undefined") return;
+                          const detail = { nodeId: node.id, type: pickType };
+                          window.dispatchEvent(new CustomEvent("bakementor:openMediaLibrary", { detail }));
+                        }}
+                      >
+                        Media library
+                      </Button>
+                    </div>
+                  );
+                }
+
                 return (
                   <Input
                     value={value}

@@ -1,6 +1,6 @@
 "use client";
 
-import type { ChangeEvent, CSSProperties, ReactNode } from "react";
+import type { ChangeEvent, CSSProperties, ReactNode, FocusEvent, ElementType } from "react";
 import { Children, useEffect, useMemo, useRef, useState } from "react";
 
 import { useBuilderStore } from "@/store/builder-store";
@@ -25,8 +25,9 @@ export function NodeRenderer({ node, breakpoint, readOnly = false, children }: N
     style.boxSizing = "border-box";
   }
 
+  
+
   const imageFileInputRef = useRef<HTMLInputElement | null>(null);
-  const videoFileInputRef = useRef<HTMLInputElement | null>(null);
   const sliderContainerRef = useRef<HTMLDivElement | null>(null);
   const sliderSlides = useMemo(() => Children.toArray(children), [children]);
   const [sliderIndex, setSliderIndex] = useState(0);
@@ -103,6 +104,26 @@ export function NodeRenderer({ node, breakpoint, readOnly = false, children }: N
   }, [node.component, isEditingLink]);
 
   const component = node.component;
+
+  if (component === "content.file") {
+    const fileUrl = (node.props?.url as string) ?? "";
+    const title = (node.props?.title as string) ?? "File";
+    return (
+      <div style={style} className="relative w-full overflow-hidden rounded-lg bg-white/90 p-4 shadow-sm flex items-center gap-3">
+        <div className="flex h-12 w-12 items-center justify-center rounded-md bg-surface-100 text-surface-600">
+          {/* simple file icon */}
+          <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+            <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <path d="M14 3v5a2 2 0 0 0 2 2h5" />
+          </svg>
+        </div>
+        <div className="flex-1 text-sm">
+          <div className="font-medium">{title}</div>
+          <div className="text-xs text-surface-500 truncate">{fileUrl}</div>
+        </div>
+      </div>
+    );
+  }
 
   if (component === "media.slider") {
     const slides = sliderSlides.length > 0 ? sliderSlides : [
@@ -198,14 +219,15 @@ export function NodeRenderer({ node, breakpoint, readOnly = false, children }: N
 
   if (component === "content.richText") {
     const value = (node.props?.text as string) ?? "Text";
-    const Tag = (node.props?.tag as keyof JSX.IntrinsicElements) ?? "p";
+  // avoid referencing JSX.IntrinsicElements directly here to keep typing simpler in this file
+  const Tag: ElementType = ((node.props?.tag as unknown) as ElementType) ?? "p";
 
     return (
       <Tag
         style={style}
         contentEditable={!readOnly}
         suppressContentEditableWarning
-        onBlur={(event) => {
+        onBlur={(event: FocusEvent<HTMLElement>) => {
           if (!readOnly) {
             updateNodeProps(node.id, { text: event.currentTarget.textContent ?? "" });
           }
@@ -337,31 +359,13 @@ export function NodeRenderer({ node, breakpoint, readOnly = false, children }: N
       const objectUrl = URL.createObjectURL(file);
       updateNodeProps(node.id, { url: objectUrl, alt: file.name, sourceType: "upload" });
     };
-
-    const openFilePicker = () => {
-      imageFileInputRef.current?.click();
-    };
-
-    const openMediaLibrary = () => {
-      if (typeof window === "undefined") return;
-      const detail = { nodeId: node.id, type: "image" };
-      window.dispatchEvent(new CustomEvent("bakementor:openMediaLibrary", { detail }));
-    };
+    // NOTE: file picker and media library are triggered from the content inspector now.
 
     return (
       <div style={containerStyle} className="relative w-full overflow-hidden rounded-xl bg-surface-100">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={src} alt={alt} style={imageStyle} />
-        {!readOnly && (
-          <div className="absolute inset-x-3 bottom-3 flex gap-2 rounded-full bg-surface-900/60 p-1 text-xs text-white backdrop-blur">
-            <button type="button" className="flex-1 rounded-full bg-white/20 px-3 py-1 transition hover:bg-white/40" onClick={openFilePicker}>
-              Upload
-            </button>
-            <button type="button" className="flex-1 rounded-full bg-white/20 px-3 py-1 transition hover:bg-white/40" onClick={openMediaLibrary}>
-              Media library
-            </button>
-          </div>
-        )}
+        {/* Overlay upload/media buttons removed — use Media library from the content inspector instead */}
         {!readOnly && (
           <input
             ref={imageFileInputRef}
@@ -378,7 +382,7 @@ export function NodeRenderer({ node, breakpoint, readOnly = false, children }: N
   if (component === "forms.input") {
     return (
       <label style={style} className="flex w-full flex-col gap-1">
-        <span className="text-xs font-medium text-surface-600">{node.props?.label ?? "Label"}</span>
+  <span className="text-xs font-medium text-surface-600">{String(node.props?.label ?? "Label")}</span>
         <input
           placeholder={(node.props?.placeholder as string) ?? "Placeholder"}
           className="h-11 w-full rounded-lg border border-surface-200 px-3 text-sm shadow-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
@@ -391,7 +395,7 @@ export function NodeRenderer({ node, breakpoint, readOnly = false, children }: N
     const rows = Number(node.props?.rows ?? 4);
     return (
       <label style={style} className="flex w-full flex-col gap-1">
-        <span className="text-xs font-medium text-surface-600">{node.props?.label ?? "Textarea"}</span>
+  <span className="text-xs font-medium text-surface-600">{String(node.props?.label ?? "Textarea")}</span>
         <textarea
           rows={Number.isNaN(rows) ? 4 : rows}
           placeholder={(node.props?.placeholder as string) ?? "Type your message"}
@@ -409,7 +413,7 @@ export function NodeRenderer({ node, breakpoint, readOnly = false, children }: N
       .filter(Boolean);
     return (
       <label style={style} className="flex w-full flex-col gap-1">
-        <span className="text-xs font-medium text-surface-600">{node.props?.label ?? "Select"}</span>
+  <span className="text-xs font-medium text-surface-600">{String(node.props?.label ?? "Select")}</span>
         <select className="h-11 w-full rounded-lg border border-surface-200 px-3 text-sm shadow-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200">
           {options.map((option) => (
             <option key={option}>{option}</option>
@@ -541,20 +545,7 @@ export function NodeRenderer({ node, breakpoint, readOnly = false, children }: N
     const poster = (node.props?.poster as string) ?? "";
     const title = (node.props?.title as string) ?? "Video";
 
-    const handleUpload = (event: ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      if (!file) return;
-      const objectUrl = URL.createObjectURL(file);
-      updateNodeProps(node.id, { source: objectUrl, poster: poster || "", sourceType: "upload" });
-    };
-
-    const openFilePicker = () => videoFileInputRef.current?.click();
-
-    const openMediaLibrary = () => {
-      if (typeof window === "undefined") return;
-      const detail = { nodeId: node.id, type: "video" };
-      window.dispatchEvent(new CustomEvent("bakementor:openMediaLibrary", { detail }));
-    };
+    // file upload and media library access are provided via the content inspector and toolbar
 
     const isEmbed = /youtu\.be|youtube\.com|vimeo\.com/.test(source ?? "");
 
@@ -579,25 +570,7 @@ export function NodeRenderer({ node, breakpoint, readOnly = false, children }: N
             <span>No video selected</span>
           </div>
         )}
-        {!readOnly && (
-          <div className="absolute inset-x-3 bottom-3 flex gap-2 rounded-full bg-black/50 p-1 text-xs text-white">
-            <button type="button" className="flex-1 rounded-full bg-white/20 px-3 py-1 transition hover:bg-white/30" onClick={openFilePicker}>
-              Upload
-            </button>
-            <button type="button" className="flex-1 rounded-full bg-white/20 px-3 py-1 transition hover:bg-white/30" onClick={openMediaLibrary}>
-              Media library
-            </button>
-          </div>
-        )}
-        {!readOnly && (
-          <input
-            ref={videoFileInputRef}
-            type="file"
-            accept="video/*"
-            className="hidden"
-            onChange={handleUpload}
-          />
-        )}
+        {/* Upload and Media library controls removed from the video renderer per UX decision */}
       </div>
     );
   }

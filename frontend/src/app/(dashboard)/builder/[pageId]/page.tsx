@@ -190,6 +190,15 @@ export default function BuilderPage() {
     }, 3000);
   }, []);
 
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { message?: string } | undefined;
+      if (detail?.message) showToast(detail.message);
+    };
+    window.addEventListener("bakementor:showToast", handler as EventListener);
+    return () => window.removeEventListener("bakementor:showToast", handler as EventListener);
+  }, [showToast]);
+
   const formatErrorMessage = (error: unknown, fallback: string) => {
     if (error && typeof error === "object" && "message" in error && typeof (error as { message: unknown }).message === "string") {
       const message = (error as { message: string }).message;

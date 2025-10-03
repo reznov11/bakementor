@@ -4,7 +4,7 @@ import type { ReactNode, CSSProperties } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, useSortable, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Copy, Trash2, Settings } from "lucide-react";
+import { Copy, Trash2, Settings, Image as ImageIcon, Film } from "lucide-react";
 
 import type { BuilderDocument, BuilderNode, BreakpointId } from "@/types/builder";
 import { NodeRenderer } from "@/features/builder/components/node-renderer";
@@ -27,14 +27,13 @@ interface CanvasNodeProps {
   hoveredNodeId: string | null;
   onHover: (nodeId: string | null) => void;
   onDuplicate: (nodeId: string) => void;
-  canDuplicate: boolean;
   onSelect: (nodeId: string) => void;
   onDelete?: (nodeId: string) => void;
   onSettings?: (nodeId: string) => void;
   children?: ReactNode;
 }
 
-function CanvasNode({ node, parentId, breakpoint, selected, hoveredNodeId, onHover, onDuplicate, canDuplicate, onSelect, onDelete, onSettings, children }: CanvasNodeProps) {
+function CanvasNode({ node, parentId, breakpoint, selected, hoveredNodeId, onHover, onDuplicate, onSelect, onDelete, onSettings, children }: CanvasNodeProps) {
   const isLayout = isLayoutNode(node);
   const { isOver, setNodeRef: setDroppableRef } = useDroppable({
     id: `container-${node.id}`,
@@ -86,6 +85,12 @@ function CanvasNode({ node, parentId, breakpoint, selected, hoveredNodeId, onHov
       : "ring-0";
   const cursorClass = isDragging ? "cursor-grabbing" : parentId === null ? "cursor-default" : "cursor-grab";
 
+  // toolbar buttons should appear for element (non-layout) nodes
+  const isElement = !isLayout && parentId !== null;
+  const showDuplicateButton = isElement;
+  const showDeleteButton = isElement && typeof onDelete === "function";
+  const showSettingsButton = isElement && typeof onSettings === "function";
+
   return (
     <div
       ref={setRefs}
@@ -97,9 +102,9 @@ function CanvasNode({ node, parentId, breakpoint, selected, hoveredNodeId, onHov
         event.stopPropagation();
         onSelect(node.id);
       }}
-      onMouseEnter={() => onHover(node.id)}
-      onMouseLeave={(event) => {
-        const nextTarget = event.relatedTarget;
+      onPointerEnter={() => onHover(node.id)}
+      onPointerLeave={(event) => {
+        const nextTarget = (event as unknown as { relatedTarget: EventTarget | null }).relatedTarget as Node | null;
         if (nextTarget instanceof Node && event.currentTarget.contains(nextTarget)) {
           return;
         }
@@ -114,12 +119,12 @@ function CanvasNode({ node, parentId, breakpoint, selected, hoveredNodeId, onHov
       >
         {node.component}
       </div>
-      {canDuplicate && (
+  {showDuplicateButton && (
         <button
           type="button"
           title="Duplicate component"
           className={`pointer-events-auto absolute top-2 right-2 inline-flex h-7 w-7 items-center justify-center rounded-full border border-surface-200 bg-white text-surface-500 shadow-sm transition hover:bg-primary-50 hover:text-primary-600 ${
-            isHovered ? "opacity-100" : "opacity-0"
+            selected || isHovered ? "opacity-100" : "opacity-0"
           }`}
           onClick={(event) => {
             event.stopPropagation();
@@ -129,12 +134,12 @@ function CanvasNode({ node, parentId, breakpoint, selected, hoveredNodeId, onHov
           <Copy className="h-3.5 w-3.5" />
         </button>
       )}
-      {onDelete && (
+  {showDeleteButton && (
         <button
           type="button"
           title="Delete component"
           className={`pointer-events-auto absolute top-2 right-10 inline-flex h-7 w-7 items-center justify-center rounded-full border border-surface-200 bg-white text-surface-500 shadow-sm transition hover:bg-red-50 hover:text-red-600 ${
-            isHovered ? "opacity-100" : "opacity-0"
+            selected || isHovered ? "opacity-100" : "opacity-0"
           }`}
           onClick={(event) => {
             event.stopPropagation();
@@ -144,12 +149,12 @@ function CanvasNode({ node, parentId, breakpoint, selected, hoveredNodeId, onHov
           <Trash2 className="h-3.5 w-3.5" />
         </button>
       )}
-      {onSettings && (
+  {showSettingsButton && (
         <button
           type="button"
           title="Open settings"
           className={`pointer-events-auto absolute top-2 right-18 inline-flex h-7 w-7 items-center justify-center rounded-full border border-surface-200 bg-white text-surface-500 shadow-sm transition hover:bg-primary-50 hover:text-primary-600 ${
-            isHovered ? "opacity-100" : "opacity-0"
+            selected || isHovered ? "opacity-100" : "opacity-0"
           }`}
           onClick={(event) => {
             event.stopPropagation();
@@ -159,6 +164,25 @@ function CanvasNode({ node, parentId, breakpoint, selected, hoveredNodeId, onHov
           <Settings className="h-3.5 w-3.5" />
         </button>
       )}
+    {/* Media library quick access for media nodes */}
+      {(
+        node.component?.startsWith("media.") || node.component === "content.image" || node.component === "content.file"
+      ) && (
+          <button
+            type="button"
+            title="Open media library"
+            className={`pointer-events-auto absolute top-2 right-26 inline-flex h-7 w-7 items-center justify-center rounded-full border border-surface-200 bg-white text-surface-500 shadow-sm transition hover:bg-primary-50 hover:text-primary-600 ${
+              selected || isHovered ? "opacity-100" : "opacity-0"
+            }`}
+            onClick={(event) => {
+              event.stopPropagation();
+              const type = node.component === "media.video" ? "video" : "image";
+              window.dispatchEvent(new CustomEvent("bakementor:openMediaLibrary", { detail: { nodeId: node.id, type } }));
+            }}
+          >
+            {node.component === "media.video" ? <Film className="h-3.5 w-3.5" /> : <ImageIcon className="h-3.5 w-3.5" />}
+          </button>
+        )}
       <NodeRenderer node={node} breakpoint={breakpoint}>
         {children}
       </NodeRenderer>
@@ -183,7 +207,7 @@ interface CanvasTreeProps {
 function CanvasTree({ node, document, parentId, breakpoint, selectedNodeId, hoveredNodeId, onHoverNode, onDuplicateNode, onSelectNode, onDeleteNode, onSettingsNode }: CanvasTreeProps) {
   const children = node.children.map((childId) => document.tree.nodes[childId]).filter(Boolean) as BuilderNode[];
   const isLayout = isLayoutNode(node);
-  const canDuplicate = !isLayout && (node.component.startsWith("content.") || node.component.startsWith("forms."));
+  // allow duplicate/delete/settings for all non-layout component nodes (computed in CanvasNode)
 
   const renderedChildren = children.map((child) => (
     <CanvasTree
@@ -223,8 +247,7 @@ function CanvasTree({ node, document, parentId, breakpoint, selectedNodeId, hove
       selected={node.id === selectedNodeId}
       hoveredNodeId={hoveredNodeId}
       onHover={onHoverNode}
-      onDuplicate={onDuplicateNode}
-      canDuplicate={canDuplicate}
+  onDuplicate={onDuplicateNode}
       onSelect={onSelectNode}
       onDelete={onDeleteNode}
       onSettings={onSettingsNode}

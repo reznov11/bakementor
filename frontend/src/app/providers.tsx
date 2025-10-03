@@ -5,6 +5,7 @@ import { ReactNode, useMemo, useState } from "react";
 
 import { AuthProvider } from "@/providers/auth-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
+import MediaLibraryModal from "@/components/media/MediaLibraryModal";
 
 interface ProvidersProps {
   children: ReactNode;
@@ -17,7 +18,10 @@ export function Providers({ children }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <AuthProvider>{memoizedChildren}</AuthProvider>
+        <AuthProvider>
+          {memoizedChildren}
+          <MediaLibraryModal />
+        </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

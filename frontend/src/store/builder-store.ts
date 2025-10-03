@@ -290,3 +290,36 @@ export const useBuilderStore = create<BuilderStore>((set) => ({
 
   markSaved: () => set({ changes: [], isSaving: false }),
 }));
+
+// Global listener for media selection from MediaLibraryModal
+if (typeof window !== "undefined") {
+  window.addEventListener("bakementor:mediaSelected", (e: Event) => {
+    try {
+      const detail = (e as CustomEvent).detail as { nodeId?: string; type?: string; file?: { file?: string; file_url?: string; title?: string } } | undefined;
+      const nodeId = detail?.nodeId;
+      const file = detail?.file;
+      const selType = detail?.type; // e.g. 'image' or 'video'
+      if (!nodeId || !file) return;
+      const store = useBuilderStore.getState();
+
+      const node = store.document?.tree.nodes[nodeId];
+      const url = file.file_url || file.file || "";
+
+      // If selecting for a video node, map to 'source' or 'poster' depending on selType
+      if (node?.component === "media.video") {
+        if (selType === "image") {
+          store.updateNodeProps(nodeId, { poster: url, posterAlt: file.title, sourceType: "library" });
+        } else {
+          // default to video source
+          store.updateNodeProps(nodeId, { source: url, title: file.title, sourceType: "library" });
+        }
+        return;
+      }
+
+      // Generic fallback for image/content types or other nodes: set url + alt
+      store.updateNodeProps(nodeId, { url, alt: file.title, sourceType: "library" });
+    } catch {
+      // ignore
+    }
+  });
+}
