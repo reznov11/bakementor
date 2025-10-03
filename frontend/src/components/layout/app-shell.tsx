@@ -8,6 +8,7 @@ import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
+import { useTranslations } from "@/i18n/provider";
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
@@ -26,6 +27,7 @@ export function AppShell({ title, action, children }: AppShellProps) {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === "dark";
+  const t = useTranslations();
 
   return (
     <div className="flex min-h-screen flex-col bg-surface-50">
@@ -46,7 +48,7 @@ export function AppShell({ title, action, children }: AppShellProps) {
                       isActive ? "text-primary-600" : "text-surface-500 hover:text-primary-500"
                     }`}
                   >
-                    {link.label}
+                    {t(link.label)}
                   </Link>
                 );
               })}
@@ -57,7 +59,7 @@ export function AppShell({ title, action, children }: AppShellProps) {
               href="/builder/new"
               className="hidden items-center gap-2 rounded-lg border border-dashed border-primary-300 px-3 py-2 text-sm font-medium text-primary-600 transition hover:border-primary-500 hover:text-primary-700 md:inline-flex"
             >
-              <Plus className="h-4 w-4" /> New page
+              <Plus className="h-4 w-4" /> {t("builder.createNew")}
             </Link>
             <Button variant="ghost" size="icon" className="md:hidden" asChild>
               <Link href="/menu">
@@ -68,7 +70,7 @@ export function AppShell({ title, action, children }: AppShellProps) {
               variant="secondary"
               size="icon"
               onClick={toggleTheme}
-              title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+              title={isDark ? t("builder.switchToLight") : t("builder.switchToDark")}
             >
               {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
@@ -76,7 +78,7 @@ export function AppShell({ title, action, children }: AppShellProps) {
               <span className="text-sm font-semibold text-surface-800">{user?.first_name || user?.email}</span>
               <span className="text-xs text-surface-500">{user?.role?.toUpperCase()}</span>
             </div>
-            <Button variant="ghost" size="icon" onClick={logout} title="Sign out">
+            <Button variant="ghost" size="icon" onClick={logout} title={t("builder.signOut")}>
               <LogOut className="h-5 w-5" />
             </Button>
           </div>
@@ -87,7 +89,7 @@ export function AppShell({ title, action, children }: AppShellProps) {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold text-surface-900">{title}</h1>
-            <p className="text-sm text-surface-500">Manage your landing pages and track performance.</p>
+            <p className="text-sm text-surface-500">{t("builder.subtitle")}</p>
           </div>
           <div className="flex items-center gap-3">
             {action}

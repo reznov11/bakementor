@@ -7,17 +7,20 @@ import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import { usePages } from "@/features/pages/hooks";
 import type { Page } from "@/types/pages";
+import { useTranslations } from "@/i18n/provider";
 
 export default function DashboardPage() {
   const { data, isLoading, error } = usePages();
   const pages: Page[] = data ?? [];
 
+  const t = useTranslations();
+
   return (
     <AppShell
-      title="Pages"
+      title={t("builder.pagesTitle")}
       action={
         <Button asChild>
-          <Link href="/builder/new">New page</Link>
+          <Link href="/builder/new">{t("builder.createNew")}</Link>
         </Button>
       }
     >
@@ -29,7 +32,7 @@ export default function DashboardPage() {
 
       {error && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-sm text-red-700">
-          We couldn&apos;t load your pages. Please try again.
+          {t("common.loadError")}
         </div>
       )}
 
@@ -44,7 +47,7 @@ export default function DashboardPage() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h3 className="text-lg font-semibold text-surface-900">{page.title}</h3>
-                  <p className="mt-1 line-clamp-2 text-sm text-surface-500">{page.description || "No description"}</p>
+                  <p className="mt-1 line-clamp-2 text-sm text-surface-500">{page.description || t("page.noDescription")}</p>
                 </div>
                 <span
                   className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${
@@ -72,7 +75,8 @@ export default function DashboardPage() {
                   </span>
                 </div>
                 <span className="inline-flex items-center gap-1 text-primary-600">
-                  Edit <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-1" />
+                  {t("builder.edit")}
+                  <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-1" />
                 </span>
               </div>
             </Link>
@@ -80,12 +84,10 @@ export default function DashboardPage() {
 
           {data?.length === 0 && (
             <div className="col-span-full rounded-2xl border border-dashed border-surface-200 bg-white p-10 text-center">
-              <h3 className="text-lg font-semibold text-surface-900">Create your first landing page</h3>
-              <p className="mt-2 text-sm text-surface-500">
-                Start from a template or build from scratch using our component library.
-              </p>
+              <h3 className="text-lg font-semibold text-surface-900">{t("page.createFirstTitle")}</h3>
+              <p className="mt-2 text-sm text-surface-500">{t("page.createFirstBody")}</p>
               <Button className="mt-6" asChild>
-                <Link href="/builder/new">Start building</Link>
+                <Link href="/builder/new">{t("common.startBuilding")}</Link>
               </Button>
             </div>
           )}

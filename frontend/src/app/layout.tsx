@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
 import { Providers } from "./providers";
 
 const geistSans = Geist({
@@ -27,15 +26,27 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
+type RootLayoutProps = {
   children: React.ReactNode;
-}) {
+  params?: { locale?: string };
+};
+
+export default async function RootLayout({ children, params }: RootLayoutProps) {
+  const locale = (params?.locale as string) ?? "ru";
+
+  let messages: Record<string, unknown> = {};
+  try {
+    // load messages for the selected locale
+    messages = await import(`../locales/${locale}.json`).then((m) => m.default || m);
+  } catch {
+    // fall back to Russian if locale not found
+    messages = await import("../locales/ru.json").then((m) => m.default || m);
+  }
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-surface-50 text-surface-900`}>
-        <Providers>{children}</Providers>
+        <Providers locale={locale} messages={messages}>{children}</Providers>
       </body>
     </html>
   );

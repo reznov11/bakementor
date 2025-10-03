@@ -1,0 +1,62 @@
+{
+  "builder": {
+    "dashboard": "Dashboard",
+    "pagesTitle": "Pages",
+    "edit": "Edit",
+    "builderName": "BakeMentor Builder",
+    "typeSearch": "Press",
+    "ctrl": "Ctrl",
+    "slash": "/",
+    "toSearch": "to search",
+    "preview": "Preview",
+    "saving": "Saving...",
+    "saveDraft": "Save draft",
+    "publishing": "Publishing...",
+    "publish": "Publish"
+    ,
+    "createNew": "New page",
+    "pageTitle": "Title",
+    "pageTitleText": "Page name",
+    "pageDescription": "Description",
+    "pageDesciptionText": "Type a short description of your page",
+    "savePage": "Save page",
+    "savingPage": "Saving...",
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode",
+    "signOut": "Sign out",
+    "subtitle": "Manage your landing pages and track performance."
+  },
+  "inspector": {
+    "content": "Content",
+    "delete": "Delete",
+    "mediaLibrary": "Media library",
+    "noEditable": "No editable properties for this component.",
+    "defaultOption": "Default",
+    "yes": "Yes",
+    "no": "No",
+    "imageURL": "Image URL",
+    "altText": "Alt text",
+    "height": "Height",
+    "objectFit": "Object fit",
+    "objectPosition": "Object position"
+  },
+  "canvas": {
+    "dropHere": "Drop components here",
+    "addImagesInsideSlider": "Add images inside the slider"
+  },
+  "page": {
+    "failedToLoad": "Failed to load the page. Please return to the dashboard and try again.",
+    "nothingToPreview": "Nothing to preview yet",
+    "componentRemoved": "Component removed",
+    "draftSaved": "Draft saved",
+    "pagePublished": "Page published",
+    "noDescription": "No description",
+    "createFirstTitle": "Create your first landing page",
+    "createFirstBody": "Start from a template or build from scratch using our component library."
+  }
+  ,
+  "common": {
+    "loadError": "We couldn't load your pages. Please try again.",
+    "startBuilding": "Start building"
+  }
+}

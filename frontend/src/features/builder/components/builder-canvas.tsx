@@ -4,7 +4,7 @@ import type { ReactNode, CSSProperties } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, useSortable, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { t } from "@/i18n";
+import { useTranslations } from "@/i18n/provider";
 import { Copy, Trash2, Settings, Image as ImageIcon, Film, ChevronUp, ChevronDown } from "lucide-react";
 
 import type { BuilderDocument, BuilderNode, BreakpointId } from "@/types/builder";
@@ -266,6 +266,7 @@ interface CanvasTreeProps {
 }
 
 function CanvasTree({ node, document, parentId, breakpoint, selectedNodeId, hoveredNodeId, onHoverNode, onDuplicateNode, onSelectNode, onDeleteNode, onSettingsNode, onMoveUp, onMoveDown }: CanvasTreeProps) {
+  const t = useTranslations();
   const children = node.children.map((childId) => document.tree.nodes[childId]).filter(Boolean) as BuilderNode[];
   const isLayout = isLayoutNode(node);
   // allow duplicate/delete/settings for all non-layout component nodes (computed in CanvasNode)
@@ -324,6 +325,7 @@ function CanvasTree({ node, document, parentId, breakpoint, selectedNodeId, hove
 }
 
 export function BuilderCanvas({ document, breakpoint, selectedNodeId, onSelectNode }: BuilderCanvasProps) {
+  // translations are used in child tree components
   const rootNode = document.tree.nodes[document.tree.root];
   const viewport = BREAKPOINT_VIEWPORTS[breakpoint];
   const hoveredNodeId = useBuilderStore((state) => state.hoveredNodeId);

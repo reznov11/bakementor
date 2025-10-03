@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import t from "@/i18n";
+import { useTranslations } from "@/i18n/provider";
 
 import type { BuilderNode } from "@/types/builder";
 import { Input } from "@/components/ui/input";
@@ -153,6 +153,7 @@ const PROPERTY_METADATA: Record<string, FieldMetadata[]> = {
 };
 
 export function PropsInspector({ node, onChange, canDelete = false, onDelete }: PropsInspectorProps) {
+  const t = useTranslations();
   const fields = useMemo(() => {
     if (!node) return [];
     return PROPERTY_METADATA[node.component] ?? [];

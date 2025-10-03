@@ -4,7 +4,7 @@ import type { ChangeEvent, CSSProperties, ReactNode, FocusEvent, ElementType } f
 import { Children, useEffect, useMemo, useRef, useState } from "react";
 
 import { useBuilderStore } from "@/store/builder-store";
-import { t } from "@/i18n";
+import { useTranslations } from "@/i18n/provider";
 import type { BuilderNode, BreakpointId } from "@/types/builder";
 import { computeNodeStyle, isLayoutNode } from "@/features/builder/style";
 
@@ -19,6 +19,7 @@ const DEFAULT_IMAGE_PLACEHOLDER =
   "data:image/svg+xml,%3Csvg width='400' height='240' viewBox='0 0 400 240' xmlns='http://www.w3.org/2000/svg'%3E%3Crect fill='%23f1f5f9' width='400' height='240' rx='16'/%3E%3Cpath stroke='%2394a3b8' stroke-width='2' stroke-dasharray='6 6' d='M32 32h336v176H32z'/%3E%3C/svg%3E";
 
 export function NodeRenderer({ node, breakpoint, readOnly = false, children }: NodeRendererProps) {
+  const t = useTranslations();
   const style = computeNodeStyle(node, breakpoint);
   const updateNodeProps = useBuilderStore((state) => state.updateNodeProps);
 

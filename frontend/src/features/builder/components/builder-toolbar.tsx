@@ -6,7 +6,7 @@ import { DEVICE_ICONS } from "@/features/builder/constants";
 import { Button } from "@/components/ui/button";
 import type { BreakpointId } from "@/types/builder";
 import { useTheme } from "@/hooks/use-theme";
-import t from "@/i18n";
+import { useTranslations } from "@/i18n/provider";
 
 interface BuilderToolbarProps {
   activeBreakpoint: BreakpointId;
@@ -35,6 +35,7 @@ export function BuilderToolbar({
 }: BuilderToolbarProps) {
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === "dark";
+  const t = useTranslations();
 
   return (
     <header className="flex items-center justify-between border-b border-surface-200 bg-white px-6 py-4">
