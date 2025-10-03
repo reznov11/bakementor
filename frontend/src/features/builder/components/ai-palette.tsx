@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { BuilderDocument, BuilderNode, BuilderTree } from "@/types/builder";
+import { aiImportProgress, aiImportResult, aiImportStart } from "@/features/pages/api";
 import { nanoid } from "nanoid";
 
 type TemplateDefinition = {
@@ -154,28 +155,41 @@ export function AiPalette({ onComplete }: AiPaletteProps) {
     [],
   );
 
-  const startImport = useCallback(() => {
+  const startImport = useCallback(async () => {
     if (!url || isRunning) return;
     setIsRunning(true);
     setProgress(0);
-    setStep(steps[0].label);
+    setStep("Starting");
 
-    let i = 0;
-    intervalRef.current = window.setInterval(() => {
-      i += 1;
-      const current = steps[Math.min(i, steps.length - 1)];
-      setStep(current.label);
-      setProgress(current.pct);
-      if (current.pct >= 100) {
-        if (intervalRef.current) window.clearInterval(intervalRef.current);
-        intervalRef.current = null;
-        // Generate a first-pass template from URL
-        const template = generateTemplateFromFigma(url);
-        onComplete(template);
-        setIsRunning(false);
-      }
-    }, 600);
-  }, [isRunning, onComplete, steps, url]);
+    try {
+      const { job_id } = await aiImportStart(url);
+      setStep("Queued");
+      intervalRef.current = window.setInterval(async () => {
+        try {
+          const { progress: p, step: s } = await aiImportProgress(job_id);
+          setProgress(p);
+          setStep(s);
+          if (p >= 100) {
+            if (intervalRef.current) window.clearInterval(intervalRef.current);
+            intervalRef.current = null;
+            const result = await aiImportResult(job_id);
+            onComplete({ tree: result.tree as BuilderTree, assets: [] as BuilderDocument["assets"], meta: result.meta });
+            setIsRunning(false);
+          }
+        } catch {
+          if (intervalRef.current) window.clearInterval(intervalRef.current);
+          intervalRef.current = null;
+          const template = generateTemplateFromFigma(url);
+          onComplete(template);
+          setIsRunning(false);
+        }
+      }, 800);
+    } catch {
+      const template = generateTemplateFromFigma(url);
+      onComplete(template);
+      setIsRunning(false);
+    }
+  }, [isRunning, onComplete, url]);
 
   useEffect(() => {
     return () => {

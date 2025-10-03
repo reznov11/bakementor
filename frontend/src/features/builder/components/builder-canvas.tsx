@@ -4,7 +4,7 @@ import type { ReactNode, CSSProperties } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, useSortable, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Copy } from "lucide-react";
+import { Copy, Trash2, Settings } from "lucide-react";
 
 import type { BuilderDocument, BuilderNode, BreakpointId } from "@/types/builder";
 import { NodeRenderer } from "@/features/builder/components/node-renderer";
@@ -29,10 +29,12 @@ interface CanvasNodeProps {
   onDuplicate: (nodeId: string) => void;
   canDuplicate: boolean;
   onSelect: (nodeId: string) => void;
+  onDelete?: (nodeId: string) => void;
+  onSettings?: (nodeId: string) => void;
   children?: ReactNode;
 }
 
-function CanvasNode({ node, parentId, breakpoint, selected, hoveredNodeId, onHover, onDuplicate, canDuplicate, onSelect, children }: CanvasNodeProps) {
+function CanvasNode({ node, parentId, breakpoint, selected, hoveredNodeId, onHover, onDuplicate, canDuplicate, onSelect, onDelete, onSettings, children }: CanvasNodeProps) {
   const isLayout = isLayoutNode(node);
   const { isOver, setNodeRef: setDroppableRef } = useDroppable({
     id: `container-${node.id}`,
@@ -115,6 +117,7 @@ function CanvasNode({ node, parentId, breakpoint, selected, hoveredNodeId, onHov
       {canDuplicate && (
         <button
           type="button"
+          title="Duplicate component"
           className={`pointer-events-auto absolute top-2 right-2 inline-flex h-7 w-7 items-center justify-center rounded-full border border-surface-200 bg-white text-surface-500 shadow-sm transition hover:bg-primary-50 hover:text-primary-600 ${
             isHovered ? "opacity-100" : "opacity-0"
           }`}
@@ -124,6 +127,36 @@ function CanvasNode({ node, parentId, breakpoint, selected, hoveredNodeId, onHov
           }}
         >
           <Copy className="h-3.5 w-3.5" />
+        </button>
+      )}
+      {onDelete && (
+        <button
+          type="button"
+          title="Delete component"
+          className={`pointer-events-auto absolute top-2 right-10 inline-flex h-7 w-7 items-center justify-center rounded-full border border-surface-200 bg-white text-surface-500 shadow-sm transition hover:bg-red-50 hover:text-red-600 ${
+            isHovered ? "opacity-100" : "opacity-0"
+          }`}
+          onClick={(event) => {
+            event.stopPropagation();
+            onDelete(node.id);
+          }}
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
+      )}
+      {onSettings && (
+        <button
+          type="button"
+          title="Open settings"
+          className={`pointer-events-auto absolute top-2 right-18 inline-flex h-7 w-7 items-center justify-center rounded-full border border-surface-200 bg-white text-surface-500 shadow-sm transition hover:bg-primary-50 hover:text-primary-600 ${
+            isHovered ? "opacity-100" : "opacity-0"
+          }`}
+          onClick={(event) => {
+            event.stopPropagation();
+            onSettings(node.id);
+          }}
+        >
+          <Settings className="h-3.5 w-3.5" />
         </button>
       )}
       <NodeRenderer node={node} breakpoint={breakpoint}>
@@ -143,9 +176,11 @@ interface CanvasTreeProps {
   onHoverNode: (nodeId: string | null) => void;
   onDuplicateNode: (nodeId: string) => void;
   onSelectNode: (nodeId: string) => void;
+  onDeleteNode?: (nodeId: string) => void;
+  onSettingsNode?: (nodeId: string) => void;
 }
 
-function CanvasTree({ node, document, parentId, breakpoint, selectedNodeId, hoveredNodeId, onHoverNode, onDuplicateNode, onSelectNode }: CanvasTreeProps) {
+function CanvasTree({ node, document, parentId, breakpoint, selectedNodeId, hoveredNodeId, onHoverNode, onDuplicateNode, onSelectNode, onDeleteNode, onSettingsNode }: CanvasTreeProps) {
   const children = node.children.map((childId) => document.tree.nodes[childId]).filter(Boolean) as BuilderNode[];
   const isLayout = isLayoutNode(node);
   const canDuplicate = !isLayout && (node.component.startsWith("content.") || node.component.startsWith("forms."));
@@ -162,6 +197,8 @@ function CanvasTree({ node, document, parentId, breakpoint, selectedNodeId, hove
       onHoverNode={onHoverNode}
       onDuplicateNode={onDuplicateNode}
       onSelectNode={onSelectNode}
+      onDeleteNode={onDeleteNode}
+      onSettingsNode={onSettingsNode}
     />
   ));
 
@@ -189,6 +226,8 @@ function CanvasTree({ node, document, parentId, breakpoint, selectedNodeId, hove
       onDuplicate={onDuplicateNode}
       canDuplicate={canDuplicate}
       onSelect={onSelectNode}
+      onDelete={onDeleteNode}
+      onSettings={onSettingsNode}
     >
       {content}
     </CanvasNode>
@@ -201,6 +240,7 @@ export function BuilderCanvas({ document, breakpoint, selectedNodeId, onSelectNo
   const hoveredNodeId = useBuilderStore((state) => state.hoveredNodeId);
   const setHoveredNode = useBuilderStore((state) => state.setHoveredNode);
   const duplicateNode = useBuilderStore((state) => state.duplicateNode);
+  const deleteNode = useBuilderStore((state) => state.deleteNode);
 
   const canvasStyle: CSSProperties = {};
   if (viewport?.width) {
@@ -237,6 +277,8 @@ export function BuilderCanvas({ document, breakpoint, selectedNodeId, onSelectNo
           onHoverNode={setHoveredNode}
           onDuplicateNode={duplicateNode}
           onSelectNode={onSelectNode}
+          onDeleteNode={deleteNode}
+          onSettingsNode={onSelectNode}
         />
       </div>
     </div>

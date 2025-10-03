@@ -142,8 +142,8 @@ CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=["http://localho
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False
 
-CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
-CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default="redis://localhost:6379/1")
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://redis:6379/0")
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default="redis://redis:6379/1")
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
@@ -153,6 +153,14 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "BakeMentor API",
     "DESCRIPTION": "API documentation for the BakeMentor page builder platform.",
     "VERSION": "0.1.0",
+}
+
+# Shared cache across backend web and Celery workers for AI progress
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": env("REDIS_CACHE_URL", default="redis://redis:6379/2"),
+    }
 }
 
 LOGGING = {

@@ -48,3 +48,23 @@ export const publishPage = async (pageId: string, versionId?: string): Promise<P
   });
   return data;
 };
+
+// AI import endpoints
+export type AiStartResponse = { job_id: string; accepted: boolean };
+export type AiProgressResponse = { job_id: string; progress: number; step: string };
+export type AiResultResponse = { tree: unknown; assets?: unknown; meta?: Record<string, unknown> };
+
+export const aiImportStart = async (figmaUrl: string): Promise<AiStartResponse> => {
+  const { data } = await apiClient.post<AiStartResponse>(`/templates/ai/import/start`, { figma_url: figmaUrl });
+  return data;
+};
+
+export const aiImportProgress = async (jobId: string): Promise<AiProgressResponse> => {
+  const { data } = await apiClient.get<AiProgressResponse>(`/templates/ai/import/${jobId}/progress`);
+  return data;
+};
+
+export const aiImportResult = async (jobId: string): Promise<AiResultResponse> => {
+  const { data } = await apiClient.get<AiResultResponse>(`/templates/ai/import/${jobId}/result`);
+  return data;
+};
