@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Image as ImageIcon, Film, FileText, File as FileIcon, Upload as UploadIcon } from "lucide-react";
+import { Image as ImageIcon, Film, Upload as UploadIcon, Check as CheckIcon } from "lucide-react";
+import NextImage from "next/image";
 import { apiClient } from "@/lib/api-client";
 
 type AxiosLikeError = { response?: { status?: number; data?: { detail?: unknown } } };
@@ -218,6 +219,19 @@ export function MediaLibraryModal() {
     }
   }, [uploads]);
 
+  function humanFileSize(bytes: number) {
+    if (bytes === 0) return "0 B";
+    const thresh = 1024;
+    const units = ["B", "KB", "MB", "GB", "TB"];
+    let u = 0;
+    let value = bytes;
+    while (value >= thresh && u < units.length - 1) {
+      value /= thresh;
+      u++;
+    }
+    return `${value.toFixed(value < 10 && u > 0 ? 1 : 0)} ${units[u]}`;
+  }
+
   return open ? (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-6">
       <div className="mx-auto w-full max-w-6xl max-h-[90vh] rounded-lg bg-white shadow-lg overflow-hidden">
@@ -241,7 +255,7 @@ export function MediaLibraryModal() {
               <Film className="h-4 w-4" /> Videos
             </button>
             <button className={`rounded px-3 py-1 text-sm flex items-center gap-2 ${mediaType === 'document' ? 'bg-surface-200' : ''}`} onClick={() => { setMediaType('document'); setShowUploadPanel(false); }}>
-              <FileText className="h-4 w-4" /> Docs
+              <NextImage src="/icons/document.svg" alt="docs" width={16} height={16} className="h-4 w-4" /> Docs
             </button>
           </div>
           <Button variant="ghost" size="sm" onClick={onUploadButtonClick}>From computer</Button>
@@ -287,19 +301,21 @@ export function MediaLibraryModal() {
                         <img src={f.file_url || f.file} alt={f.title} className="h-full w-full object-cover" />
                       ) : (
                         <div className="flex h-full items-center justify-center p-4 text-surface-500">
-                          {/* Render file-type icon for documents */}
-                          {f.mime_type === "application/pdf" ? (
-                            <FileText className="h-8 w-8 text-surface-500" />
+                          {/* Render file-type SVGs from public/icons */}
+                          {f.mime_type.startsWith("video/") ? (
+                            <NextImage src="/icons/video.svg" alt="video" width={32} height={32} className="h-8 w-8" />
+                          ) : f.mime_type === "application/pdf" ? (
+                            <NextImage src="/icons/pdf.svg" alt="pdf" width={32} height={32} className="h-8 w-8" />
                           ) : f.mime_type === "application/msword" || f.mime_type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ? (
-                            <FileIcon className="h-8 w-8 text-surface-500" />
+                            <NextImage src="/icons/word.svg" alt="word" width={32} height={32} className="h-8 w-8" />
                           ) : (
-                            <FileIcon className="h-8 w-8 text-surface-500" />
+                            <NextImage src="/icons/document.svg" alt="doc" width={32} height={32} className="h-8 w-8" />
                           )}
                         </div>
                       )}
                     </div>
 
-                    {/* centered overlay select icon */}
+                    {/* centered overlay select icon (single unified icon for all file types) */}
                     <button
                       type="button"
                       onClick={() => handleSelect(f)}
@@ -307,18 +323,13 @@ export function MediaLibraryModal() {
                       aria-label={`Select ${f.title}`}
                     >
                       <div className="rounded-full bg-white/90 p-3 shadow hover:scale-105 transition-transform">
-                        {f.mime_type.startsWith("image/") ? (
-                          <ImageIcon className="h-6 w-6 text-primary-600" />
-                        ) : f.mime_type === "application/pdf" ? (
-                          <FileText className="h-6 w-6 text-primary-600" />
-                        ) : (
-                          <FileIcon className="h-6 w-6 text-primary-600" />
-                        )}
+                        <CheckIcon className="h-6 w-6 text-primary-600" />
                       </div>
                     </button>
 
                     <div className="mt-2 px-2 py-1">
                       <div className="truncate text-sm">{f.title}</div>
+                      <div className="text-xs text-surface-500">{humanFileSize(f.size)}</div>
                     </div>
                   </div>
                 ))
