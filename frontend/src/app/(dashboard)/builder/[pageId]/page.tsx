@@ -24,7 +24,7 @@ import { StyleInspector } from "@/features/builder/components/style-inspector";
 import { PropsInspector } from "@/features/builder/components/props-inspector";
 import { BLOCK_TEMPLATES } from "@/features/builder/blocks";
 import { PAGE_TEMPLATES } from "@/features/builder/templates.extra";
-import type { BuilderNode, ComponentManifestEntry, StyleDeclaration } from "@/types/builder";
+import type { BuilderNode, ComponentManifestEntry, StyleDeclaration, BuilderDocument } from "@/types/builder";
 import { useBuilderStore } from "@/store/builder-store";
 import { createDocumentFromTree, findNode, findParentId, serializeDocumentTree } from "@/features/builder/utils";
 import { useCreatePageVersion, usePage, usePublishPage } from "@/features/pages/hooks";
@@ -212,7 +212,7 @@ export default function BuilderPage() {
     const currentVersion = page.current_version;
     const payload: PageVersionPayload = {
       title: currentVersion?.title ?? page.title ?? "Untitled page",
-      component_tree: serializeDocumentTree(document),
+      component_tree: serializeDocumentTree(document) as unknown as Record<string, unknown>,
     };
 
     if (currentVersion?.notes) {
@@ -433,6 +433,8 @@ export default function BuilderPage() {
     const { active, over } = event;
     const activeData = active.data.current;
     const overData = over?.data?.current;
+
+    console.debug("dragEnd", { active: activeData, over: overData });
 
     if (!over || !document || !activeData) {
       setActiveComponent(null);

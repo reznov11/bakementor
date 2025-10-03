@@ -182,10 +182,12 @@ export const useBuilderStore = create<BuilderStore>((set) => ({
   moveNode: ({ nodeId, targetParentId, targetIndex }) =>
     set(
       produce<BuilderStore>((state) => {
+        console.debug("moveNode called", { nodeId, targetParentId, targetIndex });
         if (!state.document) return;
         const doc = state.document;
         if (nodeId === doc.tree.root) return;
         const targetParent = doc.tree.nodes[targetParentId];
+        console.debug("targetParent children before", targetParent?.children);
         if (!targetParent) return;
 
         let insertIndex = Math.max(0, Math.min(targetIndex, targetParent.children.length));
@@ -205,6 +207,7 @@ export const useBuilderStore = create<BuilderStore>((set) => ({
         if (!targetParent.children.includes(nodeId)) {
           targetParent.children.splice(insertIndex, 0, nodeId);
         }
+        console.debug("targetParent children after", targetParent.children);
 
         state.selectedNodeId = nodeId;
         pushChange(state, { type: "MOVE_NODE", payload: { nodeId, targetParentId, targetIndex: insertIndex } });

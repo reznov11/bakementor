@@ -4,11 +4,12 @@ import type { ReactNode, CSSProperties } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, useSortable, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Copy, Trash2, Settings, Image as ImageIcon, Film } from "lucide-react";
+import { Copy, Trash2, Settings, Image as ImageIcon, Film, ChevronUp, ChevronDown } from "lucide-react";
 
 import type { BuilderDocument, BuilderNode, BreakpointId } from "@/types/builder";
 import { NodeRenderer } from "@/features/builder/components/node-renderer";
 import { isLayoutNode } from "@/features/builder/style";
+import { findParentId } from "@/features/builder/utils";
 import { BREAKPOINT_VIEWPORTS } from "@/config/builder";
 import { useBuilderStore } from "@/store/builder-store";
 
@@ -30,10 +31,12 @@ interface CanvasNodeProps {
   onSelect: (nodeId: string) => void;
   onDelete?: (nodeId: string) => void;
   onSettings?: (nodeId: string) => void;
+  onMoveUp?: (nodeId: string) => void;
+  onMoveDown?: (nodeId: string) => void;
   children?: ReactNode;
 }
 
-function CanvasNode({ node, parentId, breakpoint, selected, hoveredNodeId, onHover, onDuplicate, onSelect, onDelete, onSettings, children }: CanvasNodeProps) {
+function CanvasNode({ node, parentId, breakpoint, selected, hoveredNodeId, onHover, onDuplicate, onSelect, onDelete, onSettings, onMoveUp, onMoveDown, children }: CanvasNodeProps) {
   const isLayout = isLayoutNode(node);
   const { isOver, setNodeRef: setDroppableRef } = useDroppable({
     id: `container-${node.id}`,
@@ -90,6 +93,7 @@ function CanvasNode({ node, parentId, breakpoint, selected, hoveredNodeId, onHov
   const showDuplicateButton = isElement;
   const showDeleteButton = isElement && typeof onDelete === "function";
   const showSettingsButton = isElement && typeof onSettings === "function";
+  const showMoveButtons = isLayout && parentId !== null && node.component === "layout.section";
 
   return (
     <div
@@ -112,6 +116,22 @@ function CanvasNode({ node, parentId, breakpoint, selected, hoveredNodeId, onHov
       }}
       {...(parentId === null ? {} : { ...listeners, ...attributes })}
     >
+      {/* Drag handle for column nodes - attach listeners here to ensure dragging works when inner content captures pointer events */}
+      {node.component === "layout.column" && parentId !== null && (
+        <div
+          {...listeners}
+          {...attributes}
+          onPointerDown={(e) => e.stopPropagation()}
+          className={`pointer-events-auto absolute -top-3 left-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white border border-surface-200 text-surface-400 shadow-sm transition ${
+            isHovered ? "opacity-100" : "opacity-0"
+          }`}
+          title="Drag column"
+        >
+          <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+            <path d="M10 6h.01M14 6h.01M10 12h.01M14 12h.01M10 18h.01M14 18h.01" />
+          </svg>
+        </div>
+      )}
       <div
         className={`pointer-events-none absolute -top-2 left-0 translate-y-[-100%] rounded-full bg-primary-500 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white shadow-sm transition ${
           isHovered ? "opacity-100" : "opacity-0"
@@ -134,6 +154,36 @@ function CanvasNode({ node, parentId, breakpoint, selected, hoveredNodeId, onHov
           <Copy className="h-3.5 w-3.5" />
         </button>
       )}
+        {showMoveButtons && (
+          <div className="pointer-events-auto absolute top-2 left-2 flex items-center gap-2">
+            <button
+              type="button"
+              title="Move section up"
+              className={`inline-flex h-7 w-7 items-center justify-center rounded-full border border-surface-200 bg-white text-surface-500 shadow-sm transition hover:bg-primary-50 hover:text-primary-600 ${
+                selected || isHovered ? "opacity-100" : "opacity-0"
+              }`}
+              onClick={(event) => {
+                event.stopPropagation();
+                onMoveUp?.(node.id);
+              }}
+            >
+              <ChevronUp className="h-3.5 w-3.5" />
+            </button>
+            <button
+              type="button"
+              title="Move section down"
+              className={`inline-flex h-7 w-7 items-center justify-center rounded-full border border-surface-200 bg-white text-surface-500 shadow-sm transition hover:bg-primary-50 hover:text-primary-600 ${
+                selected || isHovered ? "opacity-100" : "opacity-0"
+              }`}
+              onClick={(event) => {
+                event.stopPropagation();
+                onMoveDown?.(node.id);
+              }}
+            >
+              <ChevronDown className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
   {showDeleteButton && (
         <button
           type="button"
@@ -143,7 +193,15 @@ function CanvasNode({ node, parentId, breakpoint, selected, hoveredNodeId, onHov
           }`}
           onClick={(event) => {
             event.stopPropagation();
-            onDelete(node.id);
+            try {
+              const ok = window.confirm("Delete this component and its children? This action cannot be undone.");
+              if (ok) {
+                onDelete?.(node.id);
+              }
+            } catch {
+              // If window.confirm is not available, fall back to delete
+              onDelete?.(node.id);
+            }
           }}
         >
           <Trash2 className="h-3.5 w-3.5" />
@@ -202,9 +260,11 @@ interface CanvasTreeProps {
   onSelectNode: (nodeId: string) => void;
   onDeleteNode?: (nodeId: string) => void;
   onSettingsNode?: (nodeId: string) => void;
+  onMoveUp?: (nodeId: string) => void;
+  onMoveDown?: (nodeId: string) => void;
 }
 
-function CanvasTree({ node, document, parentId, breakpoint, selectedNodeId, hoveredNodeId, onHoverNode, onDuplicateNode, onSelectNode, onDeleteNode, onSettingsNode }: CanvasTreeProps) {
+function CanvasTree({ node, document, parentId, breakpoint, selectedNodeId, hoveredNodeId, onHoverNode, onDuplicateNode, onSelectNode, onDeleteNode, onSettingsNode, onMoveUp, onMoveDown }: CanvasTreeProps) {
   const children = node.children.map((childId) => document.tree.nodes[childId]).filter(Boolean) as BuilderNode[];
   const isLayout = isLayoutNode(node);
   // allow duplicate/delete/settings for all non-layout component nodes (computed in CanvasNode)
@@ -223,6 +283,8 @@ function CanvasTree({ node, document, parentId, breakpoint, selectedNodeId, hove
       onSelectNode={onSelectNode}
       onDeleteNode={onDeleteNode}
       onSettingsNode={onSettingsNode}
+      onMoveUp={onMoveUp}
+      onMoveDown={onMoveDown}
     />
   ));
 
@@ -251,6 +313,8 @@ function CanvasTree({ node, document, parentId, breakpoint, selectedNodeId, hove
       onSelect={onSelectNode}
       onDelete={onDeleteNode}
       onSettings={onSettingsNode}
+      onMoveUp={onMoveUp}
+      onMoveDown={onMoveDown}
     >
       {content}
     </CanvasNode>
@@ -264,6 +328,55 @@ export function BuilderCanvas({ document, breakpoint, selectedNodeId, onSelectNo
   const setHoveredNode = useBuilderStore((state) => state.setHoveredNode);
   const duplicateNode = useBuilderStore((state) => state.duplicateNode);
   const deleteNode = useBuilderStore((state) => state.deleteNode);
+  const moveNode = useBuilderStore((state) => state.moveNode);
+  const reorderChildren = useBuilderStore((state) => state.reorderChildren);
+
+  const handleMoveUp = (nodeId: string) => {
+    const parentId = findParentId(document, nodeId);
+    if (!parentId) return;
+    const parent = document.tree.nodes[parentId];
+    const index = parent.children.indexOf(nodeId);
+    if (index <= 0) return;
+    // If moving within the same parent, perform a reorder for simplicity
+    const currentParentId = findParentId(document, nodeId);
+    if (currentParentId === parentId) {
+      const newChildren = parent.children.slice();
+      newChildren.splice(index, 1);
+      newChildren.splice(index - 1, 0, nodeId);
+      console.debug("handleMoveUp - reorderChildren", { nodeId, parentId, index, newChildren });
+      reorderChildren(parentId, newChildren);
+      return;
+    }
+
+    const targetIndex = index - 1;
+    console.debug("handleMoveUp", { nodeId, parentId, index, targetIndex, parentChildrenBefore: parent.children });
+    moveNode({ nodeId, targetParentId: parentId, targetIndex });
+  };
+
+  const handleMoveDown = (nodeId: string) => {
+    const parentId = findParentId(document, nodeId);
+    if (!parentId) return;
+    const parent = document.tree.nodes[parentId];
+    const index = parent.children.indexOf(nodeId);
+    if (index === -1 || index >= parent.children.length - 1) return;
+    // moveNode expects a targetIndex in the parent's children array BEFORE removal.
+    // When moving down within the same parent we pass index + 2 so that after
+    // removal and internal adjustment the node ends up one position lower.
+    // If moving within the same parent, reorder children directly
+    const currentParentId = findParentId(document, nodeId);
+    if (currentParentId === parentId) {
+      const newChildren = parent.children.slice();
+      newChildren.splice(index, 1);
+      newChildren.splice(index + 1, 0, nodeId);
+      console.debug("handleMoveDown - reorderChildren", { nodeId, parentId, index, newChildren });
+      reorderChildren(parentId, newChildren);
+      return;
+    }
+
+    const targetIndex = index + 2;
+    console.debug("handleMoveDown", { nodeId, parentId, index, targetIndex, parentChildrenBefore: parent.children });
+    moveNode({ nodeId, targetParentId: parentId, targetIndex });
+  };
 
   const canvasStyle: CSSProperties = {};
   if (viewport?.width) {
@@ -302,6 +415,8 @@ export function BuilderCanvas({ document, breakpoint, selectedNodeId, onSelectNo
           onSelectNode={onSelectNode}
           onDeleteNode={deleteNode}
           onSettingsNode={onSelectNode}
+          onMoveUp={handleMoveUp}
+          onMoveDown={handleMoveDown}
         />
       </div>
     </div>

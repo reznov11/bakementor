@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Image as ImageIcon, Film, Upload as UploadIcon, Check as CheckIcon } from "lucide-react";
+import { Upload as UploadIcon, Check as CheckIcon } from "lucide-react";
 import NextImage from "next/image";
 import { apiClient } from "@/lib/api-client";
 
@@ -151,10 +151,7 @@ export function MediaLibraryModal() {
     }
   }
 
-  function onUploadButtonClick() {
-    // Open the upload panel instead of launching file picker immediately
-    setShowUploadPanel(true);
-  }
+  // Upload panel is opened directly by the 'From computer' button handler
 
   function onBrowseClick() {
     if (uploadInputRef.current) {
@@ -245,20 +242,24 @@ export function MediaLibraryModal() {
 
         <div className="flex items-center gap-2 p-4">
           <div className="flex gap-1">
-            <button className={`rounded px-3 py-1 text-sm flex items-center gap-2 ${mediaType === 'all' ? 'bg-surface-200' : ''}`} onClick={() => { setMediaType('all'); setShowUploadPanel(false); }}>
-              <UploadIcon className="h-4 w-4" /> All
+              <button className={`rounded px-3 py-1 text-sm flex items-center gap-2 ${!showUploadPanel && mediaType === 'image' ? 'bg-surface-200' : ''} cursor-pointer`} onClick={() => { setMediaType('image'); setShowUploadPanel(false); }}>
+              <NextImage src="/icons/img.svg" alt="images" width={16} height={16} className="h-4 w-4" /> Images
             </button>
-            <button className={`rounded px-3 py-1 text-sm flex items-center gap-2 ${mediaType === 'image' ? 'bg-surface-200' : ''}`} onClick={() => { setMediaType('image'); setShowUploadPanel(false); }}>
-              <ImageIcon className="h-4 w-4" /> Images
+              <button className={`rounded px-3 py-1 text-sm flex items-center gap-2 ${!showUploadPanel && mediaType === 'video' ? 'bg-surface-200' : ''} cursor-pointer`} onClick={() => { setMediaType('video'); setShowUploadPanel(false); }}>
+              <NextImage src="/icons/video.svg" alt="videos" width={16} height={16} className="h-4 w-4" /> Videos
             </button>
-            <button className={`rounded px-3 py-1 text-sm flex items-center gap-2 ${mediaType === 'video' ? 'bg-surface-200' : ''}`} onClick={() => { setMediaType('video'); setShowUploadPanel(false); }}>
-              <Film className="h-4 w-4" /> Videos
-            </button>
-            <button className={`rounded px-3 py-1 text-sm flex items-center gap-2 ${mediaType === 'document' ? 'bg-surface-200' : ''}`} onClick={() => { setMediaType('document'); setShowUploadPanel(false); }}>
+              <button className={`rounded px-3 py-1 text-sm flex items-center gap-2 ${!showUploadPanel && mediaType === 'document' ? 'bg-surface-200' : ''} cursor-pointer`} onClick={() => { setMediaType('document'); setShowUploadPanel(false); }}>
               <NextImage src="/icons/document.svg" alt="docs" width={16} height={16} className="h-4 w-4" /> Docs
             </button>
           </div>
-          <Button variant="ghost" size="sm" onClick={onUploadButtonClick}>From computer</Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => { setShowUploadPanel(true); setMediaType('all'); }}
+              className={`flex items-center gap-2 ${showUploadPanel ? 'bg-surface-200' : ''} cursor-pointer`}
+            >
+              <NextImage src="/icons/computer.svg" alt="computer" width={16} height={16} className="h-4 w-4 mr-2" /> From computer
+            </Button>
         </div>
 
         <div className="p-4 overflow-auto">
