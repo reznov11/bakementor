@@ -12,8 +12,7 @@
     "saving": "Saving...",
     "saveDraft": "Save draft",
     "publishing": "Publishing...",
-    "publish": "Publish"
-    ,
+    "publish": "Publish",
     "createNew": "New page",
     "pageTitle": "Title",
     "pageTitleText": "Page name",
@@ -24,7 +23,35 @@
     "switchToLight": "Switch to light mode",
     "switchToDark": "Switch to dark mode",
     "signOut": "Sign out",
-    "subtitle": "Manage your landing pages and track performance."
+    "subtitle": "Manage your landing pages and track performance.",
+    "key_shortcuts": {
+      "title": "Keyboard shortcuts",
+      "close": "Close",
+      "description": "Boost your workflow with these quick commands.",
+      "keys": "Open shortcuts",
+      "draft": "Save draft",
+      "publish": "Publish page",
+      "preview": "Preview current page",
+      "blocks": "Open block library",
+      "elements": "Open element library",
+      "ai": "AI"
+    },
+    "components": {
+      "title": "Components",
+      "description": "Drag components into the canvas",
+      "categories": {
+        "layout": "Layout",
+        "content": "Content",
+        "media": "Media",
+        "forms": "Forms"
+      }
+    },
+    "tabs": {
+      "elements": "Elements",
+      "blocks": "Blocks",
+      "templates": "Templates",
+      "ai": "AI"
+    }
   },
   "inspector": {
     "content": "Content",
@@ -53,10 +80,71 @@
     "noDescription": "No description",
     "createFirstTitle": "Create your first landing page",
     "createFirstBody": "Start from a template or build from scratch using our component library."
-  }
-  ,
+  },
   "common": {
     "loadError": "We couldn't load your pages. Please try again.",
     "startBuilding": "Start building"
+  },
+  "dashboard": {
+    "tags": "tags",
+    "navbar": {
+      "home": "Dashboard",
+      "analytics": "Analytics",
+      "media": "Media"
+    }
+  },
+  "palettes": {
+    "layout": {
+      "section": {
+        "title": "Section",
+        "text": "Full-width section container"
+      },
+      "container": {
+        "title": "Container",
+        "text": "Centered wrapper with max width"
+      },
+      "row": {
+        "title": "Row",
+        "text": "Horizontal flex row"
+      },
+      "column": {
+        "title": "Column",
+        "text": "Vertical stack"
+      },
+      "two_columns": {
+        "title": "2 Columns",
+        "text": "Even two-column layout"
+      },
+      "three_columns": {
+        "title": "3 Columns",
+        "text": "Three responsive columns"
+      },
+      "four_columns": {
+        "title": "4 Columns",
+        "text": "Four-column grid"
+      },
+      "navbar": {
+        "title": "Navbar",
+        "text": "Header navigation bar"
+      },
+      "nav_menu": {
+        "title": "Nav Menu",
+        "text": "Horizontal navigation list"
+      },
+      "nav_item": {
+        "title": "Nav Item",
+        "text": "Navigation link with optional dropdown"
+      },
+      "dropdown": {
+        "title": "Dropdown",
+        "text": "Stack of dropdown links"
+      },
+      "footer": {
+        "title": "Footer",
+        "text": "Footer container"
+      }
+    },
+    "content": {
+    }
   }
 }

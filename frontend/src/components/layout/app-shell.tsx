@@ -10,12 +10,6 @@ import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
 import { useTranslations } from "@/i18n/provider";
 
-const navLinks = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/analytics", label: "Analytics" },
-  { href: "/media", label: "Media" },
-];
-
 interface AppShellProps {
   title?: string;
   action?: ReactNode;
@@ -28,6 +22,12 @@ export function AppShell({ title, action, children }: AppShellProps) {
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === "dark";
   const t = useTranslations();
+
+  const navLinks = [
+    { href: "/dashboard", label: t('dashboard.navbar.home') },
+    { href: "/analytics", label: t('dashboard.navbar.analytics') },
+    { href: "/media", label: t('dashboard.navbar.media') },
+  ];
 
   return (
     <div className="flex min-h-screen flex-col bg-surface-50">

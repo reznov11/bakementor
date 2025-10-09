@@ -30,17 +30,9 @@ import { createDocumentFromTree, findNode, findParentId, serializeDocumentTree }
 import { useCreatePageVersion, usePage, usePublishPage } from "@/features/pages/hooks";
 import type { PageVersionPayload } from "@/types/pages";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "@/i18n/provider";
 
 const PREVIEW_STORAGE_KEY_PREFIX = "bakementor:preview:";
-
-const KEYBOARD_SHORTCUTS: Array<{ combo: string; description: string }> = [
-  { combo: "Ctrl + /", description: "Open shortcuts" },
-  { combo: "Ctrl + S", description: "Save draft" },
-  { combo: "Ctrl + P", description: "Publish page" },
-  { combo: "Ctrl + R", description: "Preview current page" },
-  { combo: "Ctrl + B", description: "Open block library" },
-  { combo: "Ctrl + E", description: "Open element library" },
-];
 
 export default function BuilderPage() {
   const params = useParams<{ pageId: string }>();
@@ -50,6 +42,17 @@ export default function BuilderPage() {
   }
 
   const router = useRouter();
+  const t = useTranslations();
+
+  const KEYBOARD_SHORTCUTS: Array<{ combo: string; description: string }> = [
+    { combo: "Ctrl + /", description: t("builder.key_shortcuts.keys") },
+    { combo: "Ctrl + S", description: t("builder.key_shortcuts.draft") },
+    { combo: "Ctrl + P", description: t("builder.key_shortcuts.publish") },
+    { combo: "Ctrl + R", description: t("builder.key_shortcuts.preview") },
+    { combo: "Ctrl + B", description: t("builder.key_shortcuts.blocks") },
+    { combo: "Ctrl + E", description: t("builder.key_shortcuts.elements") },
+    { combo: "Ctrl + I", description: t("builder.key_shortcuts.ai") },
+  ];
 
   const document = useBuilderStore((state) => state.document);
   const selectedNodeId = useBuilderStore((state) => state.selectedNodeId);
@@ -547,7 +550,7 @@ export default function BuilderPage() {
         isPublishing={isPublishing}
       />
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-        <div className="grid flex-1 grid-cols-[300px_1fr] overflow-hidden bg-surface-100">
+        <div className="grid flex-1 grid-cols-[350px_1fr] overflow-hidden bg-surface-100">
           <aside className="hidden h-full min-h-0 flex-col border-r border-surface-200 bg-white xl:flex">
             {isConfigPanelVisible ? (
               <div className="flex h-full flex-col">
@@ -600,7 +603,7 @@ export default function BuilderPage() {
                       paletteTab === "elements" ? "bg-primary-600 text-white" : "text-surface-500 hover:text-primary-600"
                     }`}
                   >
-                    Elements
+                    {t("builder.tabs.elements")}
                   </button>
                   <button
                     type="button"
@@ -609,7 +612,7 @@ export default function BuilderPage() {
                       paletteTab === "blocks" ? "bg-primary-600 text-white" : "text-surface-500 hover:text-primary-600"
                     }`}
                   >
-                    Blocks
+                    {t("builder.tabs.blocks")}
                   </button>
                   <button
                     type="button"
@@ -618,7 +621,7 @@ export default function BuilderPage() {
                       paletteTab === "templates" ? "bg-primary-600 text-white" : "text-surface-500 hover:text-primary-600"
                     }`}
                   >
-                    Templates
+                    {t("builder.tabs.templates")}
                   </button>
                   <button
                     type="button"
@@ -627,7 +630,7 @@ export default function BuilderPage() {
                       paletteTab === "ai" ? "bg-primary-600 text-white" : "text-surface-500 hover:text-primary-600"
                     }`}
                   >
-                    AI
+                    {t("builder.tabs.ai")}
                   </button>
                 </div>
                 <div className="flex-1 overflow-y-auto px-4 pb-6 pt-4">
@@ -673,11 +676,11 @@ export default function BuilderPage() {
           >
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-surface-900">Keyboard shortcuts</h2>
-                <p className="text-sm text-surface-500">Boost your workflow with these quick commands.</p>
+                <h2 className="text-lg font-semibold text-surface-900">{t('builder.key_shortcuts.title')}</h2>
+                <p className="text-sm text-surface-500">{t('builder.key_shortcuts.description')}</p>
               </div>
               <Button variant="ghost" size="sm" onClick={closeShortcuts}>
-                Close
+                {t('builder.key_shortcuts.close')}
               </Button>
             </div>
             <div className="mt-5 flex flex-col gap-3">

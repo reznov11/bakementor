@@ -4,8 +4,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "layout.section",
     category: "layout",
-    label: "Section",
-    description: "Full-width section container",
+    label: "palettes.layout.section.title",
+    description: "palettes.layout.section.text",
     defaultProps: {
       background: { type: "solid", value: "surface-50" },
     },
@@ -59,10 +59,57 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
     ],
   },
   {
+    key: "layout.container",
+    category: "layout",
+    label: "palettes.layout.container.title",
+    description: "palettes.layout.section.text",
+    defaultProps: {},
+    schema: {},
+    styleHandles: [
+      {
+        id: "layout",
+        label: "Layout",
+        group: "layout",
+        controls: [
+          { property: "width", type: "input" },
+          { property: "maxWidth", type: "input" },
+          { property: "margin", type: "four-sides" },
+        ],
+      },
+      {
+        id: "spacing",
+        label: "Spacing",
+        group: "spacing",
+        controls: [
+          { property: "padding", type: "four-sides" },
+        ],
+      },
+    ],
+    allowedChildren: [
+      "layout.row",
+      "layout.column",
+      "content.richText",
+      "content.button",
+      "content.image",
+      "content.logo",
+      "content.navLink",
+      "content.link",
+      "content.stat",
+      "forms.input",
+      "forms.select",
+      "forms.textarea",
+      "forms.checkbox",
+      "forms.radio",
+      "forms.datetime",
+      "media.video",
+      "media.slider",
+    ],
+  },
+  {
     key: "layout.row",
     category: "layout",
-    label: "Row",
-    description: "Horizontal flex row",
+    label: "palettes.layout.row.title",
+    description: "palettes.layout.row.text",
     defaultProps: {
       direction: "row",
     },
@@ -110,8 +157,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "layout.column",
     category: "layout",
-    label: "Column",
-    description: "Vertical stack",
+    label: "palettes.layout.column.title",
+    description: "palettes.layout.column.text",
     defaultProps: {},
     schema: {},
     styleHandles: [
@@ -151,57 +198,10 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
     ],
   },
   {
-    key: "layout.container",
-    category: "layout",
-    label: "Container",
-    description: "Centered wrapper with max width",
-    defaultProps: {},
-    schema: {},
-    styleHandles: [
-      {
-        id: "layout",
-        label: "Layout",
-        group: "layout",
-        controls: [
-          { property: "width", type: "input" },
-          { property: "maxWidth", type: "input" },
-          { property: "margin", type: "four-sides" },
-        ],
-      },
-      {
-        id: "spacing",
-        label: "Spacing",
-        group: "spacing",
-        controls: [
-          { property: "padding", type: "four-sides" },
-        ],
-      },
-    ],
-    allowedChildren: [
-      "layout.row",
-      "layout.column",
-      "content.richText",
-      "content.button",
-      "content.image",
-      "content.logo",
-      "content.navLink",
-      "content.link",
-      "content.stat",
-      "forms.input",
-      "forms.select",
-      "forms.textarea",
-      "forms.checkbox",
-      "forms.radio",
-      "forms.datetime",
-      "media.video",
-      "media.slider",
-    ],
-  },
-  {
     key: "layout.columns-2",
     category: "layout",
-    label: "2 Columns",
-    description: "Even two-column layout",
+    label: "palettes.layout.two_columns.title",
+    description: "palettes.layout.two_columns.text",
     defaultProps: {},
     schema: {},
     styleHandles: [
@@ -226,8 +226,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "layout.columns-3",
     category: "layout",
-    label: "3 Columns",
-    description: "Three responsive columns",
+    label: "palettes.layout.three_columns.title",
+    description: "palettes.layout.three_columns.text",
     defaultProps: {},
     schema: {},
     styleHandles: [
@@ -252,8 +252,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "layout.columns-4",
     category: "layout",
-    label: "4 Columns",
-    description: "Four-column grid",
+    label: "palettes.layout.four_columns.title",
+    description: "palettes.layout.four_columns.text",
     defaultProps: {},
     schema: {},
     styleHandles: [
@@ -483,8 +483,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "layout.navbar",
     category: "layout",
-    label: "Navbar",
-    description: "Header navigation bar",
+    label: "palettes.layout.navbar.title",
+    description: "palettes.layout.navbar.text",
     defaultProps: {},
     schema: {},
     styleHandles: [
@@ -503,8 +503,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "layout.navMenu",
     category: "layout",
-    label: "Nav Menu",
-    description: "Horizontal navigation list",
+    label: "palettes.layout.nav_menu.title",
+    description: "palettes.layout.nav_menu.text",
     defaultProps: {},
     schema: {},
     styleHandles: [
@@ -523,8 +523,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "layout.navItem",
     category: "layout",
-    label: "Nav Item",
-    description: "Navigation link with optional dropdown",
+    label: "palettes.layout.nav_item.title",
+    description: "palettes.layout.nav_item.text",
     defaultProps: {},
     schema: {},
     styleHandles: [
@@ -542,8 +542,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "layout.navDropdown",
     category: "layout",
-    label: "Dropdown",
-    description: "Stack of dropdown links",
+    label: "palettes.layout.dropdown.title",
+    description: "palettes.layout.dropdown.text",
     defaultProps: {},
     schema: {},
     styleHandles: [
@@ -567,8 +567,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "layout.footer",
     category: "layout",
-    label: "Footer",
-    description: "Footer container",
+    label: "palettes.layout.footer.title",
+    description: "palettes.layout.footer.text",
     defaultProps: {},
     schema: {},
     styleHandles: [

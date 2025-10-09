@@ -4,19 +4,15 @@ import { useMemo } from "react";
 import { useDraggable } from "@dnd-kit/core";
 
 import type { ComponentManifestEntry } from "@/types/builder";
+import { useTranslations } from "@/i18n/provider";
 
 interface ComponentPaletteProps {
   manifest: ComponentManifestEntry[];
 }
 
-const CATEGORY_LABELS: Record<string, string> = {
-  layout: "Layout",
-  content: "Content",
-  media: "Media",
-  forms: "Forms",
-};
-
 function PaletteItem({ entry }: { entry: ComponentManifestEntry }) {
+  const t = useTranslations();
+
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `palette:${entry.key}`,
     data: {
@@ -34,15 +30,24 @@ function PaletteItem({ entry }: { entry: ComponentManifestEntry }) {
         isDragging ? "opacity-50 cursor-grabbing" : "cursor-grab"
       }`}
     >
-      <span className="text-sm font-medium text-surface-800">{entry.label}</span>
+      <span className="text-sm font-medium text-surface-800">{t(entry.label)}</span>
       {entry.description && (
-        <span className="text-xs text-surface-500 line-clamp-2">{entry.description}</span>
+        <span className="text-xs text-surface-500 line-clamp-2">{t(entry.description)}</span>
       )}
     </button>
   );
 }
 
 export function ComponentPalette({ manifest }: ComponentPaletteProps) {
+  const t = useTranslations();
+
+  const CATEGORY_LABELS: Record<string, string> = {
+    layout: t("builder.components.categories.layout"),
+    content: t("builder.components.categories.content"),
+    media: t("builder.components.categories.media"),
+    forms: t("builder.components.categories.forms"),
+  };
+
   const grouped = useMemo(() => {
     const groups = new Map<string, ComponentManifestEntry[]>();
     manifest.forEach((entry) => {
@@ -58,8 +63,8 @@ export function ComponentPalette({ manifest }: ComponentPaletteProps) {
   return (
     <aside className="theme-light-scope flex h-full min-w-[240px] flex-col gap-4 overflow-y-auto border-r border-surface-200 bg-white p-4">
       <header className="flex flex-col gap-1">
-        <h2 className="text-sm font-semibold text-surface-800">Components</h2>
-        <p className="text-xs text-surface-500">Drag components into the canvas</p>
+        <h2 className="text-sm font-semibold text-surface-800">{t("builder.components.title")}</h2>
+        <p className="text-xs text-surface-500">{t("builder.components.description")}</p>
       </header>
       <div className="flex flex-col gap-4">
         {grouped.map(([category, entries]) => (

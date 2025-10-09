@@ -71,7 +71,7 @@ export default function DashboardPage() {
                   </span>
                   <span className="inline-flex items-center gap-1 rounded-full bg-surface-100 px-2 py-1">
                     <BarChart3 className="h-3.5 w-3.5" />
-                    {(page.tags ?? []).length} tags
+                    {(page.tags ?? []).length} {t("dashboard.tags")}
                   </span>
                 </div>
                 <span className="inline-flex items-center gap-1 text-primary-600">
