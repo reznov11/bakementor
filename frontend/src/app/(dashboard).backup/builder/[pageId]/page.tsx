@@ -232,7 +232,7 @@ export default function BuilderPage() {
   }, [document, page]);
 
   const handleBack = () => {
-    router.push("/dashboard");
+    router.push("dashboard");
   };
 
   const previewStorageKey = pageId ? `${PREVIEW_STORAGE_KEY_PREFIX}${pageId}` : null;
@@ -519,7 +519,7 @@ export default function BuilderPage() {
   if (isPageError) {
     console.error("Failed to load page", pageError);
     return (
-      <main className="flex h-full items-center justify-center bg-surface-100">
+      <main className="flex h-screen items-center justify-center bg-surface-100">
         <div className="rounded-lg border border-surface-200 bg-white px-6 py-4 text-sm text-surface-500 shadow-subtle">
           Failed to load page. Please return to the dashboard and try again.
         </div>
@@ -529,7 +529,7 @@ export default function BuilderPage() {
 
   if (!document || isPageLoading) {
     return (
-      <main className="flex h-full items-center justify-center bg-surface-100">
+      <main className="flex h-screen items-center justify-center bg-surface-100">
         <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary-200 border-t-primary-600" />
       </main>
     );
@@ -724,7 +724,7 @@ export default function BuilderPage() {
           page={page}
           open={isSettingsOpen}
           onClose={() => setIsSettingsOpen(false)}
-          onDeleted={() => router.push("/dashboard")}
+          onDeleted={() => router.push("dashboard")}
         />
       )}
       {toast && (

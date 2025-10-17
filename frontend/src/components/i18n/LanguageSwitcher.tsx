@@ -28,14 +28,14 @@ export default function LanguageSwitcher() {
     try {
       const pref = localStorage.getItem("locale");
       if (pref) setCurrent(pref);
-    } catch {}
+    } catch { }
   }, [pathname]);
 
   const changeLocale = (locale: string) => {
     // persist
     try {
       localStorage.setItem("locale", locale);
-    } catch {}
+    } catch { }
 
     // compute new path: if pathname starts with /en or /ru, replace it; otherwise prefix
     const parts = pathname.split("/").filter(Boolean);
@@ -51,10 +51,20 @@ export default function LanguageSwitcher() {
     const sp = searchParams ? searchParams.toString() : "";
     if (sp) newPath = `${newPath}?${sp}`;
 
+    // set cookie so server-side RootLayout can read it immediately (fallback)
+    try {
+      document.cookie = `locale=${locale}; path=/`;
+    } catch { }
+
     setCurrent(locale);
     setOpen(false);
-    // navigate
-    router.push(newPath);
+    // Use full page navigation to force server-side RootLayout to re-run and load messages for the new locale
+    // This avoids relying on client-only routing which may not rehydrate server-loaded translations.
+    if (typeof window !== "undefined") {
+      window.location.href = newPath;
+    } else {
+      router.push(newPath);
+    }
   };
 
   return (

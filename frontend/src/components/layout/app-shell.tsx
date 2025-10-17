@@ -25,9 +25,9 @@ export function AppShell({ title, action, children }: AppShellProps) {
   const t = useTranslations();
 
   const navLinks = [
-    { href: "/dashboard", label: t('dashboard.navbar.home') },
-    { href: "/analytics", label: t('dashboard.navbar.analytics') },
-    { href: "/media", label: t('dashboard.navbar.media') },
+    { href: `dashboard`, label: t('dashboard.navbar.home') },
+    { href: `analytics`, label: t('dashboard.navbar.analytics') },
+    { href: `media`, label: t('dashboard.navbar.media') },
   ];
 
   return (
@@ -35,12 +35,12 @@ export function AppShell({ title, action, children }: AppShellProps) {
       <header className="border-b border-surface-200 bg-white">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-6">
-            <Link href="/dashboard" className="text-lg font-semibold text-primary-600">
+            <Link href="dashboard" className="text-lg font-semibold text-primary-600">
               BakeMentor
             </Link>
             <nav className="hidden items-center gap-4 md:flex">
               {navLinks.map((link) => {
-                const isActive = pathname?.startsWith(link.href);
+                const isActive = pathname?.includes(link.href);
                 return (
                   <Link
                     key={link.href}
@@ -54,10 +54,11 @@ export function AppShell({ title, action, children }: AppShellProps) {
                 );
               })}
             </nav>
+            <LanguageSwitcher />
           </div>
           <div className="flex items-center gap-3">
             <Link
-              href="/builder/new"
+              href="builder/new"
               className="hidden items-center gap-2 rounded-lg border border-dashed border-primary-300 px-3 py-2 text-sm font-medium text-primary-600 transition hover:border-primary-500 hover:text-primary-700 md:inline-flex"
             >
               <Plus className="h-4 w-4" /> {t("builder.createNew")}
@@ -67,7 +68,6 @@ export function AppShell({ title, action, children }: AppShellProps) {
                 <Menu className="h-5 w-5" />
               </Link>
             </Button>
-            <LanguageSwitcher />
             <Button
               variant="secondary"
               size="icon"
@@ -96,7 +96,7 @@ export function AppShell({ title, action, children }: AppShellProps) {
           <div className="flex items-center gap-3">
             {action}
             <Button variant="secondary" size="icon" asChild>
-              <Link href="/settings">
+              <Link href="settings">
                 <Settings className="h-4 w-4" />
               </Link>
             </Button>

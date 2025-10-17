@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import { cookies } from "next/headers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,7 +33,18 @@ type RootLayoutProps = {
 };
 
 export default async function RootLayout({ children, params }: RootLayoutProps) {
-  const locale = (params?.locale as string) ?? "ru";
+  // Determine locale from route param or cookie (middleware sets cookie when prefix is used)
+  let locale = (params?.locale as string) ?? undefined;
+  if (!locale) {
+    try {
+      const cookieStore = await cookies();
+      const c = cookieStore.get("locale");
+      if (c) locale = c.value;
+    } catch {
+      // ignore
+    }
+  }
+  locale = locale ?? "ru";
 
   let messages: Record<string, unknown> = {};
   try {

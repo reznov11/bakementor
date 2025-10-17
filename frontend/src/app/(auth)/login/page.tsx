@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -13,18 +13,31 @@ import { Label } from "@/components/ui/label";
 import { Alert } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/use-auth";
 import { useTranslations } from "@/i18n/provider";
+import { authStorage } from "@/lib/auth-storage";
 
 export default function LoginPage() {
+  const user = authStorage.getUser();
+  const locale = window.localStorage.getItem("locale") || "ru";
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login, loading } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations();
 
+  useEffect(() => {
+    // If already logged in, redirect to dashboard
+    if (user) {
+      const redirectTo = searchParams.get("next") || `/${locale}/dashboard`;
+      router.push(redirectTo);
+    }
+  }, [user, router, searchParams, locale]);
+
   const loginSchema = z.object({
     email: z.string().email(t("login_page.errors.invalidEmail")),
     password: z.string().min(8, t("login_page.errors.invalidPassword")),
   });
+
   type LoginValues = z.infer<typeof loginSchema>;
 
   const {
@@ -43,7 +56,7 @@ export default function LoginPage() {
     setError(null);
     try {
       await login(values);
-      const redirectTo = searchParams.get("next") || "/dashboard";
+      const redirectTo = searchParams.get("next") || `/${locale}/dashboard`;
       router.push(redirectTo);
     } catch (err) {
       console.error(err);
