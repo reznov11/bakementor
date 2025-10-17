@@ -38,6 +38,8 @@
     },
     "components": {
       "title": "Components",
+      "noElementsSelected": "Nothing selected",
+      "selectedItem": "Selected",
       "description": "Drag components into the canvas",
       "categories": {
         "layout": "Layout",
@@ -54,6 +56,7 @@
     }
   },
   "inspector": {
+    "title": "Content config",
     "content": "Content",
     "delete": "Delete",
     "mediaLibrary": "Media library",
@@ -145,6 +148,87 @@
       }
     },
     "content": {
+      "text": {
+        "title": "Text",
+        "text": "Rich text block",
+        "placeholder": "Start writing..."
+      },
+      "button": {
+        "title": "Button",
+        "text": "Primary call-to-action",
+        "placeholder": "Click me"
+      },
+      "logo": {
+        "title": "Logo",
+        "text": "Brand logo"
+      },
+      "nav_link": {
+        "title": "Nav Link",
+        "text": "Navigation link"
+      },
+      "text_link": {
+        "title": "Text Link",
+        "text": "Standalone hyperlink"
+      },
+      "statistic": {
+        "title": "Statistic",
+        "text": "Metric with label"
+      }
+    },
+    "media": {
+      "image": {
+        "title": "Image",
+        "text": "Display an image asset"
+      },
+      "video": {
+        "title": "Video",
+        "text": "Upload or embed a video player"
+      },
+      "carousel": {
+        "title": "Carousel",
+        "text": "Horizontal carousel of images"
+      }
+    },
+    "forms": {
+      "input": {
+        "title": "Input Field",
+        "text": "Single-line text input"
+      },
+      "textarea": {
+        "title": "Textarea",
+        "text": "Multi-line text input"
+      },
+      "select": {
+        "title": "Select Box",
+        "text": "Dropdown selection field"
+      },
+      "checkbox": {
+        "title": "Checkbox",
+        "text": "Single checkbox option"
+      },
+      "radio": {
+        "title": "Radio Button",
+        "text": "Single radio button option"
+      },
+      "datetime": {
+        "title": "Date Picker",
+        "text": "Select a date and time from a calendar"
+      }
+    }
+  },
+  "login_page": {
+    "title": "Sign in to BakeMentor",
+    "subtitle": "Use your company credentials to access the builder.",
+    "emailLabel": "Work Email",
+    "emailPassword": "Password",
+    "signInButton": "Sign In",
+    "loading": "Signing in...",
+    "helpText": "Need help? Contact the",
+    "adminTeam": "admin team.",
+    "errors": {
+      "invalidEmail": "Enter a valid corporate email",
+      "invalidPassword": "Password must be at least 8 characters",
+      "invalidCredentials": "Invalid email or password."
     }
   }
 }

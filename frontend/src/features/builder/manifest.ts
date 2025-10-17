@@ -278,10 +278,10 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "content.richText",
     category: "content",
-    label: "Text",
-    description: "Rich text block",
+    label: "palettes.content.text.title",
+    description: "palettes.content.text.text",
     defaultProps: {
-      text: "Start writing...",
+      text: "palletes.content.text.placeholder",
       tag: "p",
     },
     schema: {},
@@ -309,10 +309,10 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "content.button",
     category: "content",
-    label: "Button",
-    description: "Primary call-to-action",
+    label: "palettes.content.button.title",
+    description: "palettes.content.button.text",
     defaultProps: {
-      label: "Click me",
+      label: "palettes.content.button.placeholder",
       href: "#",
       variant: "primary",
     },
@@ -335,8 +335,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "content.image",
     category: "media",
-    label: "Image",
-    description: "Displays an image asset",
+    label: "palettes.media.image.title",
+    description: "palettes.media.image.text",
     defaultProps: {
       assetId: null,
       alt: "",
@@ -359,8 +359,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "forms.input",
     category: "forms",
-    label: "Form Input",
-    description: "Collect user input",
+    label: "palettes.forms.input.title",
+    description: "palettes.forms.input.text",
     defaultProps: {
       name: "email",
       label: "Email",
@@ -381,8 +381,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "forms.textarea",
     category: "forms",
-    label: "Textarea",
-    description: "Multi-line text input",
+    label: "palettes.forms.textarea.title",
+    description: "palettes.forms.textarea.text",
     defaultProps: {
       name: "message",
       label: "Message",
@@ -402,8 +402,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "forms.select",
     category: "forms",
-    label: "Select",
-    description: "Dropdown input",
+    label: "palettes.forms.select.title",
+    description: "palettes.forms.select.text",
     defaultProps: {
       name: "plan",
       label: "Select option",
@@ -422,8 +422,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "forms.checkbox",
     category: "forms",
-    label: "Checkbox",
-    description: "Toggle with label",
+    label: "palettes.forms.checkbox.title",
+    description: "palettes.forms.checkbox.text",
     defaultProps: {
       label: "Accept terms",
       name: "checkbox",
@@ -442,8 +442,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "forms.radio",
     category: "forms",
-    label: "Radio button",
-    description: "Option within a group",
+    label: "palettes.forms.radio.title",
+    description: "palettes.forms.radio.text",
     defaultProps: {
       label: "Radio option",
       name: "radio-group",
@@ -463,8 +463,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "forms.datetime",
     category: "forms",
-    label: "Date & time",
-    description: "Datetime picker",
+    label: "palettes.forms.datetime.title",
+    description: "palettes.forms.datetime.text",
     defaultProps: {
       label: "Date & time",
       name: "datetime",
@@ -600,8 +600,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "content.logo",
     category: "content",
-    label: "Logo",
-    description: "Brand logo",
+    label: "palettes.content.logo.title",
+    description: "palettes.content.logo.text",
     defaultProps: {
       text: "BakeMentor",
       href: "/",
@@ -620,8 +620,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "content.navLink",
     category: "content",
-    label: "Nav Link",
-    description: "Navigation link",
+    label: "palettes.content.nav_link.title",
+    description: "palettes.content.nav_link.text",
     defaultProps: {
       label: "Menu",
       href: "#",
@@ -642,8 +642,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "content.link",
     category: "content",
-    label: "Text Link",
-    description: "Standalone hyperlink",
+    label: "palettes.content.text_link.title",
+    description: "palettes.content.text_link.text",
     defaultProps: {
       label: "New link",
       href: "https://example.com",
@@ -667,8 +667,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "content.stat",
     category: "content",
-    label: "Statistic",
-    description: "Metric with label",
+    label: "palettes.content.statistic.title",
+    description: "palettes.content.statistic.text",
     defaultProps: {
       value: "120%",
       label: "Growth rate",
@@ -690,8 +690,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "media.video",
     category: "media",
-    label: "Video",
-    description: "Upload or embed a video",
+    label: "palettes.media.video.title",
+    description: "palettes.media.video.text",
     defaultProps: {
       source: "",
       poster: "",
@@ -714,8 +714,8 @@ export const BUILDER_MANIFEST: ComponentManifestEntry[] = [
   {
     key: "media.slider",
     category: "media",
-    label: "Image Slider",
-    description: "Horizontal carousel of images",
+    label: "palettes.media.carousel.title",
+    description: "palettes.media.carousel.text",
     defaultProps: {
       autoplay: "5000",
     },

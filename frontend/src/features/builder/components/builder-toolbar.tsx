@@ -66,12 +66,12 @@ export function BuilderToolbar({
               key={breakpoint}
               type="button"
               onClick={() => onBreakpointChange(breakpoint)}
-              className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition ${
+              className={`flex items-center gap-1 cursor-pointer rounded-full px-3 py-1 text-xs font-medium transition ${
                 activeBreakpoint === breakpoint ? "bg-white text-primary-600 shadow-sm" : "text-surface-500 hover:text-primary-600"
               }`}
             >
               {DEVICE_ICONS[breakpoint]}
-              <span className="hidden capitalize sm:inline">{breakpoint}</span>
+              {/* <span className="hidden capitalize sm:inline">{breakpoint}</span> */}
             </button>
           ))}
         </div>

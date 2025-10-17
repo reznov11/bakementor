@@ -12,19 +12,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/use-auth";
-
-const loginSchema = z.object({
-  email: z.string().email("Enter a valid corporate email"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-});
-
-type LoginValues = z.infer<typeof loginSchema>;
+import { useTranslations } from "@/i18n/provider";
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login, loading } = useAuth();
   const [error, setError] = useState<string | null>(null);
+  const t = useTranslations();
+
+  const loginSchema = z.object({
+    email: z.string().email(t("login_page.errors.invalidEmail")),
+    password: z.string().min(8, t("login_page.errors.invalidPassword")),
+  });
+  type LoginValues = z.infer<typeof loginSchema>;
+
   const {
     register,
     handleSubmit,
@@ -53,19 +55,19 @@ export default function LoginPage() {
     <main className="flex min-h-screen items-center justify-center bg-surface-50 px-6 py-16">
       <div className="w-full max-w-md rounded-3xl border border-surface-200 bg-white p-8 shadow-subtle">
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-semibold text-surface-900">Sign in to BakeMentor</h1>
-          <p className="mt-2 text-sm text-surface-600">Use your company credentials to access the builder.</p>
+          <h1 className="text-2xl font-semibold text-surface-900">{t('login_page.title')}</h1>
+          <p className="mt-2 text-sm text-surface-600">{t('login_page.subtitle')}</p>
         </div>
 
         <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-2">
-            <Label htmlFor="email">Work email</Label>
+            <Label htmlFor="email">{t('login_page.emailLabel')}</Label>
             <Input id="email" type="email" autoComplete="email" {...register("email")} />
             {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t('login_page.emailPassword')}</Label>
             <Input id="password" type="password" autoComplete="current-password" {...register("password")} />
             {errors.password && <p className="text-sm text-red-600">{errors.password.message}</p>}
           </div>
@@ -73,12 +75,15 @@ export default function LoginPage() {
           {error && <Alert variant="warning" message={error} />}
 
           <Button type="submit" className="w-full" disabled={isSubmitting || loading}>
-            {isSubmitting ? "Signing in..." : "Sign in"}
+            {isSubmitting ? t("login_page.loading") : t("login_page.signInButton")}
           </Button>
         </form>
 
         <p className="mt-6 text-center text-xs text-surface-500">
-          Need access? Contact the <Link href="mailto:it-support@company.com" className="text-primary-600">admin team</Link>.
+          {t("login_page.helpText")}
+          <Link href="mailto:it-support@company.com" className="text-primary-600">
+            {t("login_page.adminTeam")}
+          </Link>.
         </p>
       </div>
     </main>

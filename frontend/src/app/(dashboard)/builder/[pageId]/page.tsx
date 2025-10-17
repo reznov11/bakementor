@@ -563,12 +563,16 @@ export default function BuilderPage() {
                     <ArrowLeft className="h-3.5 w-3.5" />
                     Library
                   </button>
-                  <span className="text-[11px] font-semibold uppercase tracking-wide text-surface-400">Content config</span>
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-surface-400">
+                    {t("inspector.title")}
+                  </span>
                 </div>
                 <div className="border-b border-surface-200 px-4 py-3">
-                  <p className="text-[10px] uppercase tracking-wide text-surface-400">Selected</p>
+                  <p className="text-[10px] uppercase tracking-wide text-surface-400">
+                    {t("builder.components.selectedItem")}
+                  </p>
                   <p className="text-sm font-semibold text-surface-800">
-                    {selectedNodeDefinition?.label ?? selectedNode?.component ?? "Nothing selected"}
+                    {t(selectedNodeDefinition?.label || '') ?? t(selectedNode?.component || '') ?? t("builder.components.noElementsSelected")}
                   </p>
                 </div>
                 <div className="flex-1 overflow-y-auto px-4 py-4">
