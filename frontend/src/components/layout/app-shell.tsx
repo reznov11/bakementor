@@ -6,6 +6,7 @@ import { LogOut, Menu, Moon, Plus, Settings, Sun } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
+import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
 import { useTranslations } from "@/i18n/provider";
@@ -66,6 +67,7 @@ export function AppShell({ title, action, children }: AppShellProps) {
                 <Menu className="h-5 w-5" />
               </Link>
             </Button>
+            <LanguageSwitcher />
             <Button
               variant="secondary"
               size="icon"

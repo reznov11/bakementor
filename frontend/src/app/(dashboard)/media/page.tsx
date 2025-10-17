@@ -4,14 +4,17 @@ import Link from "next/link";
 
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "@/i18n/provider";
 
 export default function MediaLibraryPage() {
+  const t = useTranslations();
+
   return (
     <AppShell
-      title="Media library"
+      title={t("inspector.mediaLibrary" ) || "Media Library"}
       action={
         <Button asChild>
-          <Link href="/media/upload">Upload media</Link>
+          <Link href="/media/upload">{t("inspector.mediaLibrary")}</Link>
         </Button>
       }
     >
