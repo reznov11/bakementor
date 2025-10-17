@@ -59,7 +59,7 @@ export default function DashboardPage() {
                   }`}
                 >
                   {page.status === "published" && <CircleCheck className="h-3.5 w-3.5" />}
-                  {page.status.charAt(0).toUpperCase() + page.status.slice(1)}
+                  {t(`page.status.${page.status}`)}
                 </span>
               </div>
 

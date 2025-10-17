@@ -298,7 +298,7 @@ export default function BuilderPage() {
     try {
       await createPageVersion.mutateAsync(payload);
       markSaved();
-      showToast("Draft saved");
+      showToast(t("page.draftSaved") || "Draft saved");
     } catch (error) {
       console.error("Failed to save draft", error);
       showToast(formatErrorMessage(error, "Failed to save draft"));
@@ -331,7 +331,7 @@ export default function BuilderPage() {
       createdVersionId = version.id;
       await publishPageMutation.mutateAsync({ versionId: version.id });
       markSaved();
-      showToast("Page published");
+      showToast(t("page.pagePublished") || "Page published");
     } catch (error) {
       console.error("Failed to publish page", error);
       if (createdVersionId) {
@@ -675,7 +675,7 @@ export default function BuilderPage() {
         <DragOverlay>
           {activeComponent ? (
             <div className="rounded-lg border border-primary-200 bg-white px-4 py-2 text-sm font-medium text-primary-600 shadow-subtle">
-              {activeComponent.label}
+              {t(activeComponent.label)}
             </div>
           ) : null}
         </DragOverlay>

@@ -59,4 +59,3 @@ class PublishStatus(models.TextChoices):
     DRAFT = "draft", "Draft"
     REVIEW = "review", "In review"
     PUBLISHED = "published", "Published"
-

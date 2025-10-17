@@ -7,6 +7,37 @@ from rest_framework import serializers
 from .models import Page, PageVersion
 
 
+class PageListVersionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PageVersion
+        exclude = ("component_tree",)
+
+
+class PageListSerializer(serializers.ModelSerializer):
+    owner_email = serializers.EmailField(source="owner.email", read_only=True)
+    current_version = PageListVersionSerializer(read_only=True)
+    published_version = PageListVersionSerializer(read_only=True)
+
+    class Meta:
+        model = Page
+        fields = (
+            "id",
+            "title",
+            "slug",
+            "description",
+            "status",
+            "is_public",
+            "tags",
+            "owner",
+            "owner_email",
+            "current_version",
+            "published_version",
+            "published_at",
+            "created_at",
+            "updated_at",
+        )
+
+
 class PageVersionWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = PageVersion

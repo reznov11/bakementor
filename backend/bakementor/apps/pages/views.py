@@ -14,6 +14,7 @@ from .serializers import (
     PageSerializer,
     PageVersionSerializer,
     PageVersionWriteSerializer,
+    PageListSerializer,
 )
 
 
@@ -30,6 +31,8 @@ class PageViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "create":
             return PageCreateSerializer
+        elif self.action == "list":
+            return PageListSerializer  # lightweight serializer for list
         return PageSerializer
 
     def create(self, request, *args, **kwargs):

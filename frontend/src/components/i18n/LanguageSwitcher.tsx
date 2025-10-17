@@ -4,10 +4,11 @@ import { useState, useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 const LOCALES = [
-  { code: "en", label: "English", flag: "🇺🇸" },
-  { code: "ru", label: "Русский", flag: "🇷🇺" },
+  { code: "en", label: "English", flag: "/icons/us.svg" },
+  { code: "ru", label: "Русский", flag: "/icons/ru.svg" },
 ];
 
 export default function LanguageSwitcher() {
@@ -69,15 +70,17 @@ export default function LanguageSwitcher() {
 
   return (
     <div className="relative">
-      <div className="inline-flex items-center gap-2">
-        <Button variant="ghost" size="icon" onClick={() => setOpen((v) => !v)} title="Change language">
+      <div className="inline-flex items-center cursor-pointer" onClick={() => setOpen((v) => !v)} title="Change language">
+        <Button variant="ghost" size="icon">
           <Globe className="h-4 w-4" />
         </Button>
-        <div className="hidden md:block text-sm">{LOCALES.find((l) => l.code === current)?.flag}</div>
+        <div className="hidden md:block text-sm hover:text-blue-600">
+          {LOCALES.find((l) => l.code === current)?.label}
+        </div>
       </div>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-40 rounded-md border bg-white shadow-lg">
+        <div className="absolute mt-2 w-40 rounded-md border bg-white shadow-lg">
           <div className="flex flex-col">
             {LOCALES.map((l) => (
               <button
@@ -85,7 +88,13 @@ export default function LanguageSwitcher() {
                 className={`flex items-center gap-2 px-3 py-2 text-left text-sm hover:bg-surface-100 ${l.code === current ? "font-semibold" : ""}`}
                 onClick={() => changeLocale(l.code)}
               >
-                <span className="text-lg">{l.flag}</span>
+                <Image
+                  src={l.flag}
+                  alt={l.label}
+                  width={25}
+                  height={25}
+                  className="rounded-sm"
+                />
                 <span>{l.label}</span>
               </button>
             ))}

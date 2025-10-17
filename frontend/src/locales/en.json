@@ -87,7 +87,12 @@
     "pagePublished": "Page published",
     "noDescription": "No description",
     "createFirstTitle": "Create your first landing page",
-    "createFirstBody": "Start from a template or build from scratch using our component library."
+    "createFirstBody": "Start from a template or build from scratch using our component library.",
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "review": "In Review"
+    }
   },
   "common": {
     "loadError": "We couldn't load your pages. Please try again.",
