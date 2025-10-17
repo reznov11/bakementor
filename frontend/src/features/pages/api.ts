@@ -49,6 +49,15 @@ export const publishPage = async (pageId: string, versionId?: string): Promise<P
   return data;
 };
 
+export const updatePage = async (pageId: string, payload: Partial<{ title: string; description: string; tags: string[] }>): Promise<Page> => {
+  const { data } = await apiClient.patch<Page>(`/pages/${pageId}/`, payload);
+  return data;
+};
+
+export const deletePage = async (pageId: string): Promise<void> => {
+  await apiClient.delete(`/pages/${pageId}/`);
+};
+
 // AI import endpoints
 export type AiStartResponse = { job_id: string; accepted: boolean };
 export type AiProgressResponse = { job_id: string; progress: number; step: string };

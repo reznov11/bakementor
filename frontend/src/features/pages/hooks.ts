@@ -9,6 +9,8 @@ import {
   fetchPages,
   fetchPageVersions,
   publishPage,
+  updatePage,
+  deletePage,
 } from "@/features/pages/api";
 import type { Page, PageDraftInput, PageVersion, PageVersionPayload, PublishResponse } from "@/types/pages";
 
@@ -65,6 +67,31 @@ export const usePublishPage = (pageId: string) => {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [...PAGES_QUERY_KEY, pageId] });
       void queryClient.invalidateQueries({ queryKey: [...PAGES_QUERY_KEY, pageId, "versions"] });
+      void queryClient.invalidateQueries({ queryKey: PAGES_QUERY_KEY });
+    },
+  });
+};
+
+export const useUpdatePage = (pageId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    Page,
+    Error,
+    Partial<{ title: string; description: string; tags: string[] }>
+  >({
+    mutationFn: (payload) => updatePage(pageId, payload),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: [...PAGES_QUERY_KEY, pageId] });
+      void queryClient.invalidateQueries({ queryKey: PAGES_QUERY_KEY });
+    },
+  });
+};
+
+export const useDeletePage = (pageId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, void>({
+    mutationFn: () => deletePage(pageId),
+    onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: PAGES_QUERY_KEY });
     },
   });

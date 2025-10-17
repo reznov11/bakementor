@@ -1,6 +1,7 @@
 {
   "builder": {
     "dashboard": "Панель",
+    "pageSettings": "Настройки страницы",
     "pagesTitle": "Страницы",
     "edit": "Редактировать",
     "builderName": "Конструктор BakeMentor",
@@ -24,6 +25,7 @@
     "switchToDark": "Переключить на тёмный режим",
     "signOut": "Выйти",
     "subtitle": "Управляйте лендингами и отслеживайте производительность.",
+    "pageSaved": "Страница сохранена",
     "key_shortcuts": {
       "title": "Сочетания клавиш",
       "close": "Закрыть",
@@ -68,7 +70,8 @@
     "altText": "Alt текст",
     "height": "Высота",
     "objectFit": "Режим заполнения",
-    "objectPosition": "Позиция изображения"
+    "objectPosition": "Позиция изображения",
+    "confirmDelete": "Подтвердить удаление"
   },
   "canvas": {
     "dropHere": "Перетащите компоненты сюда",
@@ -86,7 +89,9 @@
   },
   "common": {
     "loadError": "Не удалось загрузить страницы. Пожалуйста, попробуйте ещё раз.",
-    "startBuilding": "Начать работу"
+    "startBuilding": "Начать работу",
+    "cancel": "Отмена",
+    "confirm": "Подтвердить"
   },
   "dashboard": {
     "tags": "тегов",

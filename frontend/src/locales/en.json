@@ -1,6 +1,7 @@
 {
   "builder": {
     "dashboard": "Dashboard",
+    "pageSettings": "Page settings",
     "pagesTitle": "Pages",
     "edit": "Edit",
     "builderName": "BakeMentor Builder",
@@ -24,6 +25,7 @@
     "switchToDark": "Switch to dark mode",
     "signOut": "Sign out",
     "subtitle": "Manage your landing pages and track performance.",
+    "pageSaved": "Page saved",
     "key_shortcuts": {
       "title": "Keyboard shortcuts",
       "close": "Close",
@@ -68,7 +70,8 @@
     "altText": "Alt text",
     "height": "Height",
     "objectFit": "Object fit",
-    "objectPosition": "Object position"
+    "objectPosition": "Object position",
+    "confirmDelete": "Confirm delete"
   },
   "canvas": {
     "dropHere": "Drop components here",
@@ -86,7 +89,9 @@
   },
   "common": {
     "loadError": "We couldn't load your pages. Please try again.",
-    "startBuilding": "Start building"
+    "startBuilding": "Start building",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
   },
   "dashboard": {
     "tags": "tags",

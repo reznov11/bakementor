@@ -12,7 +12,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Edit } from "lucide-react";
 
 import { BuilderToolbar } from "@/features/builder/components/builder-toolbar";
 import { ComponentPalette } from "@/features/builder/components/component-palette";
@@ -31,6 +31,7 @@ import { useCreatePageVersion, usePage, usePublishPage } from "@/features/pages/
 import type { PageVersionPayload } from "@/types/pages";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/i18n/provider";
+import PageSettingsModal from "@/features/pages/components/PageSettingsModal";
 
 const PREVIEW_STORAGE_KEY_PREFIX = "bakementor:preview:";
 
@@ -513,6 +514,7 @@ export default function BuilderPage() {
 
   const isPublishing = publishFlowActive || publishPageMutation.isPending;
   const isSavingDraft = createPageVersion.isPending && !publishFlowActive;
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   if (isPageError) {
     console.error("Failed to load page", pageError);
@@ -549,6 +551,15 @@ export default function BuilderPage() {
         isSavingDraft={isSavingDraft}
         isPublishing={isPublishing}
       />
+      {/* small edit page settings button */}
+      {page && (
+        <div className="fixed right-6 top-20 z-50 hidden items-center gap-2 sm:flex">
+          <Button size="sm" variant="secondary" onClick={() => setIsSettingsOpen(true)}>
+            <Edit className="mr-2 h-4 w-4" />
+            {t("builder.edit")}
+          </Button>
+        </div>
+      )}
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div className="grid flex-1 grid-cols-[350px_1fr] overflow-hidden bg-surface-100">
           <aside className="hidden h-full min-h-0 flex-col border-r border-surface-200 bg-white xl:flex">
@@ -707,6 +718,14 @@ export default function BuilderPage() {
             </div>
           </div>
         </div>
+      )}
+      {page && (
+        <PageSettingsModal
+          page={page}
+          open={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+          onDeleted={() => router.push("/dashboard")}
+        />
       )}
       {toast && (
         <div className="pointer-events-auto fixed bottom-6 right-6 min-w-[220px] rounded-lg bg-surface-900 px-4 py-3 text-sm font-medium text-white shadow-subtle">
