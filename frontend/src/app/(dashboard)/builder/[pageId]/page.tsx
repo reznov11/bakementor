@@ -603,7 +603,7 @@ export default function BuilderPage() {
                     </div>
                   ) : (
                     <div className="flex h-full items-center justify-center px-2 text-center text-xs text-surface-500">
-                      Select a component to configure its content and styling.
+                      {t("builder.components.noElementsSelected")}
                     </div>
                   )}
                 </div>

@@ -71,7 +71,9 @@
     "height": "Height",
     "objectFit": "Object fit",
     "objectPosition": "Object position",
-    "confirmDelete": "Confirm delete"
+    "confirmDelete": "Confirm delete",
+    "confirmDeletePage": "Are you sure you want to delete this component? This action cannot be undone.",
+    "confirmDeleteComponent": "Are you sure you want to delete this component? This action cannot be undone."
   },
   "canvas": {
     "dropHere": "Drop components here",

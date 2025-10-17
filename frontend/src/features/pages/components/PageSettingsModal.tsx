@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useTranslations } from "@/i18n/provider";
 import type { Page } from "@/types/pages";
 import { useUpdatePage, useDeletePage } from "@/features/pages/hooks";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 interface Props {
   page: Page;
@@ -27,6 +28,7 @@ export default function PageSettingsModal({ page, open, onClose, onDeleted }: Pr
 
   const update = useUpdatePage(String(page.id));
   const del = useDeletePage(String(page.id));
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const handleSave = async () => {
     try {
@@ -50,7 +52,6 @@ export default function PageSettingsModal({ page, open, onClose, onDeleted }: Pr
   };
 
   const handleDelete = async () => {
-    if (!confirm(t("inspector.confirmDelete") || "Are you sure you want to delete this page? This cannot be undone.")) return;
     try {
       await del.mutateAsync();
       if (typeof window !== "undefined") {
@@ -91,9 +92,23 @@ export default function PageSettingsModal({ page, open, onClose, onDeleted }: Pr
         </div>
         <div className="mt-6 flex items-center justify-between">
           <div>
-            <Button variant="destructive" onClick={handleDelete} disabled={del.isPending}>
-              {t("inspector.delete")}
-            </Button>
+            <>
+              <Button variant="destructive" onClick={() => setConfirmOpen(true)} disabled={del.isPending}>
+                {t("inspector.delete")}
+              </Button>
+              <ConfirmDialog
+                open={confirmOpen}
+                title={t("inspector.confirmDelete") || "Confirm delete"}
+                description={t("inspector.confirmDeletePage") || "Are you sure you want to delete this page? This cannot be undone."}
+                confirmLabel={t("inspector.delete") || "Delete"}
+                cancelLabel={t("common.cancel") || "Cancel"}
+                onCancel={() => setConfirmOpen(false)}
+                onConfirm={() => {
+                  setConfirmOpen(false);
+                  void handleDelete();
+                }}
+              />
+            </>
           </div>
           <div className="flex gap-2">
             <Button variant="ghost" onClick={onClose}>{t("common.cancel") || "Cancel"}</Button>

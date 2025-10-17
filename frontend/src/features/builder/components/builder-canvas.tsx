@@ -1,10 +1,11 @@
 "use client";
 
-import type { ReactNode, CSSProperties } from "react";
+import React, { useState, type ReactNode, type CSSProperties } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, useSortable, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useTranslations } from "@/i18n/provider";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { Copy, Trash2, Settings, Image as ImageIcon, Film, ChevronUp, ChevronDown } from "lucide-react";
 
 import type { BuilderDocument, BuilderNode, BreakpointId } from "@/types/builder";
@@ -38,6 +39,8 @@ interface CanvasNodeProps {
 }
 
 function CanvasNode({ node, parentId, breakpoint, selected, hoveredNodeId, onHover, onDuplicate, onSelect, onDelete, onSettings, onMoveUp, onMoveDown, children }: CanvasNodeProps) {
+  const t = useTranslations();
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const isLayout = isLayoutNode(node);
   const { isOver, setNodeRef: setDroppableRef } = useDroppable({
     id: `container-${node.id}`,
@@ -185,28 +188,34 @@ function CanvasNode({ node, parentId, breakpoint, selected, hoveredNodeId, onHov
             </button>
           </div>
         )}
-  {showDeleteButton && (
-        <button
-          type="button"
-          title="Delete component"
-          className={`pointer-events-auto absolute top-2 right-10 inline-flex h-7 w-7 items-center justify-center rounded-full border border-surface-200 bg-white text-surface-500 shadow-sm transition hover:bg-red-50 hover:text-red-600 ${
-            selected || isHovered ? "opacity-100" : "opacity-0"
-          }`}
-          onClick={(event) => {
-            event.stopPropagation();
-            try {
-              const ok = window.confirm("Delete this component and its children? This action cannot be undone.");
-              if (ok) {
-                onDelete?.(node.id);
-              }
-            } catch {
-              // If window.confirm is not available, fall back to delete
+      {showDeleteButton && (
+        <>
+          <button
+            type="button"
+            title="Delete component"
+            className={`pointer-events-auto absolute top-2 right-10 inline-flex h-7 w-7 items-center justify-center rounded-full border border-surface-200 bg-white text-surface-500 shadow-sm transition hover:bg-red-50 hover:text-red-600 ${
+              selected || isHovered ? "opacity-100" : "opacity-0"
+            }`}
+            onClick={(event) => {
+              event.stopPropagation();
+              setConfirmOpen(true);
+            }}
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+          <ConfirmDialog
+            open={confirmOpen}
+            title={t("inspector.confirmDelete") || "Confirm delete"}
+            description={t("inspector.confirmDeleteComponent") || "Delete this component and its children? This action cannot be undone."}
+            confirmLabel={t("inspector.delete") || "Delete"}
+            cancelLabel={t("common.cancel") || "Cancel"}
+            onCancel={() => setConfirmOpen(false)}
+            onConfirm={() => {
+              setConfirmOpen(false);
               onDelete?.(node.id);
-            }
-          }}
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </button>
+            }}
+          />
+        </>
       )}
   {showSettingsButton && (
         <button
